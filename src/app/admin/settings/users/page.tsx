@@ -1,37 +1,36 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
-import { 
-  Edit, 
-  Trash2, 
-  Search, 
-  Users, 
-  Shield, 
-  ShieldCheck, 
-  Mail, 
-  Phone, 
+import dayjs from 'dayjs';
+import {
+  Edit,
+  Trash2,
+  Search,
+  Users,
+  Shield,
+  ShieldCheck,
+  Mail,
+  Phone,
   MapPin,
   Eye,
   MoreVertical,
   Filter,
-  Plus
+  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
-interface userType{
-    id:number;
-    name:string;
-    email:string;
-    phone:string;
-    address:string;
-    role:string;
-    createdAt:string;
-
-
+interface userType {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  role: string;
+  createdAt: string;
 }
 export default function UsersTable() {
   // Sample users data
-    const router = useRouter();
+  const router = useRouter();
   const [users, setUsers] = useState<userType[]>([]);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -40,37 +39,35 @@ export default function UsersTable() {
   const [selectedUser, setSelectedUser] = useState<userType | null>(null);
 
   // Filter users based on search and filters
-  const filteredUsers: userType[] = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredUsers: userType[] = users.filter((user) => {
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-  
-    
+
     return matchesSearch && matchesRole;
   });
 
-  useEffect(()=>{
-
+  useEffect(() => {
     const fetchUsers = async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL
-        const resposne = await fetch(`${apiUrl}users`, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`, // Replace with your actual token
-          },
-        })
-        const data: userType[] = await resposne.json();
-        if (!resposne.ok) {
-          console.error("Failed to fetch users", data);
-            alert("Failed to fetch users");
-          return;
-        }
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const resposne = await fetch(`${apiUrl}users`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Replace with your actual token
+        },
+      });
+      const data: userType[] = await resposne.json();
+      if (!resposne.ok) {
+        console.error("Failed to fetch users", data);
+        alert("Failed to fetch users");
+        return;
+      }
 
-        setUsers(data);
-        console.log(data)
-    }
+      setUsers(data);
+      console.log(data);
+    };
     fetchUsers();
-
-  },[])
+  }, []);
 
   const handleEdit = (user: userType) => {
     console.log("Edit user:", user);
@@ -81,13 +78,37 @@ export default function UsersTable() {
     setSelectedUser(user);
     setShowDeleteModal(true);
   };
-  const confirmDelete = (): void => {
-    if (selectedUser) {
-      setUsers(users.filter(user => user.id !== selectedUser.id));
+  const confirmDelete = async (): Promise<void> => {
+    if (!selectedUser) return;
+
+    try {
+      const token = Cookies.get("token");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}delete/${selectedUser.id}`, {
+        method: "DELETE",
+        headers: {
+          // "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUsers(users.filter((user) => user.id !== selectedUser.id));
+        alert("User deleted successfully");
+      } else {
+        alert(data.message || "Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Something went wrong while deleting the user");
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedUser(null);
     }
-    setShowDeleteModal(false);
-    setSelectedUser(null);
   };
+
   const handleView = (user: userType) => {
     console.log("View user:", user);
     // Implement view functionality
@@ -103,8 +124,12 @@ export default function UsersTable() {
               <Users className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Users Management</h1>
-              <p className="text-gray-600">Manage and monitor all user accounts</p>
+              <h1 className="text-3xl font-bold text-gray-800">
+                Users Management
+              </h1>
+              <p className="text-gray-600">
+                Manage and monitor all user accounts
+              </p>
             </div>
           </div>
         </div>
@@ -140,7 +165,10 @@ export default function UsersTable() {
                   <option value="user">User</option>
                 </select>
               </div>
-              <button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl" onClick={()=> router.push("/admin/settings/users/create")}>
+              <button
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                onClick={() => router.push("/admin/settings/users/create")}
+              >
                 <Plus className="w-4 h-4" />
                 Add User
               </button>
@@ -166,17 +194,17 @@ export default function UsersTable() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  {/* <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Actions
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.map((user, index) => (
-                  <tr 
-                    key={user.id} 
+                  <tr
+                    key={user.id}
                     className={`hover:bg-blue-50/50 transition-colors duration-200 ${
-                      index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/30'
+                      index % 2 === 0 ? "bg-white/50" : "bg-gray-50/30"
                     }`}
                   >
                     {/* User Info */}
@@ -184,11 +212,16 @@ export default function UsersTable() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
                           <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-white font-semibold text-lg">
-                            {user.name.split(' ').map(n => n[0]).join('')}
+                            {user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-semibold text-gray-900">{user.name}</div>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {user.name}
+                          </div>
                           <div className="text-sm text-gray-600 flex items-center gap-1">
                             <Mail className="w-3 h-3" />
                             {user.email}
@@ -205,18 +238,22 @@ export default function UsersTable() {
                       </div>
                       <div className="text-sm text-gray-600 flex items-center gap-1">
                         <MapPin className="w-3 h-3 text-gray-400" />
-                        <span className="truncate max-w-48">{user.address}</span>
+                        <span className="truncate max-w-48">
+                          {user.address}
+                        </span>
                       </div>
                     </td>
 
                     {/* Role */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                        user.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-800 border border-purple-200' 
-                          : 'bg-blue-100 text-blue-800 border border-blue-200'
-                      }`}>
-                        {user.role === 'admin' ? (
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                          user.role === "admin"
+                            ? "bg-purple-100 text-purple-800 border border-purple-200"
+                            : "bg-blue-100 text-blue-800 border border-blue-200"
+                        }`}
+                      >
+                        {user.role === "admin" ? (
                           <ShieldCheck className="w-3 h-3" />
                         ) : (
                           <Shield className="w-3 h-3" />
@@ -225,28 +262,22 @@ export default function UsersTable() {
                       </span>
                     </td>
 
-                
-
                     {/* Created Date */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(user.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
+                      {dayjs(user.createdAt).format("MMM D, YYYY")}
                     </td>
 
                     {/* Actions */}
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        {/* <button
                           onClick={() => handleView(user)}
                           className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
-                        </button>
-                        <button
+                        </button> */}
+                        {/* <button
                           onClick={() => handleEdit(user)}
                           className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
                           title="Edit User"
@@ -259,7 +290,7 @@ export default function UsersTable() {
                           title="Delete User"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
@@ -272,8 +303,12 @@ export default function UsersTable() {
           {filteredUsers.length === 0 && (
             <div className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-              <p className="text-gray-600">Try adjusting your search or filters</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No users found
+              </h3>
+              <p className="text-gray-600">
+                Try adjusting your search or filters
+              </p>
             </div>
           )}
         </div>
@@ -298,29 +333,32 @@ export default function UsersTable() {
                 <Trash2 className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete User</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Delete User
+                </h3>
                 <p className="text-gray-600">This action cannot be undone</p>
               </div>
             </div>
-            
+
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete <strong>{selectedUser.name}</strong>? 
-              This will permanently remove their account and all associated data.
+              Are you sure you want to delete{" "}
+              <strong>{selectedUser.name}</strong>? This will permanently remove
+              their account and all associated data.
             </p>
-            
+
             <div className="flex gap-3 justify-end">
-              <button
+              {/* <button
                 onClick={() => setShowDeleteModal(false)}
                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
               >
                 Cancel
-              </button>
-              <button
+              </button> */}
+              {/* <button
                 onClick={confirmDelete}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
               >
                 Delete User
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Cookies from "js-cookie"; // Ensure you have js-cookie installed
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Gallery {
   id: number;
@@ -54,12 +55,15 @@ export default function GalleryList() {
 
       if (res.ok) {
         setGalleries((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Image Deleted Successfully")
       } else {
         const error = await res.json();
-        alert(error.message || "Delete failed.");
+        // alert(error.message || "Delete failed.");
+        toast.error(error.message || "Delete failed.");
       }
     } catch (err) {
-      alert("Delete error.");
+      // alert("Delete error.");
+      toast.error("Delete Error")
     }
   };
 

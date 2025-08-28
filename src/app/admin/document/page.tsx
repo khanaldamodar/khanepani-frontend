@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 interface Document {
   id: number;
@@ -40,11 +41,14 @@ export default function AllDocumentsPage() {
 
       if (res.ok) {
         setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+         return toast.success("Document Deleted Successfully")
       } else {
-        alert('Failed to delete');
+        
+        toast.error("Failed to delete document");
       }
     } catch (err) {
-      alert('Error occurred while deleting');
+      toast.error("Error occurred while deleting document");
+      // alert('Error occurred while deleting');
     }
   };
 

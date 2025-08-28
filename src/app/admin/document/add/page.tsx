@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Cookies from "js-cookie";
+import toast from 'react-hot-toast';
 
 export default function AddDocumentPage() {
   const [form, setForm] = useState({
@@ -63,7 +64,8 @@ export default function AddDocumentPage() {
 
     try {
       const token = Cookies.get("token");
-      const res = await fetch("http://127.0.0.1:8000/api/documents", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      const res = await fetch(`${apiUrl}documents`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // Replace `yourToken` with the actual token variable
@@ -73,14 +75,18 @@ export default function AddDocumentPage() {
 
       if (res.ok) {
         setSuccess(true);
+        toast.success("Document added Successfully!!")
         setForm({ subject: "", type: "", file: null });
         (document.getElementById("file") as HTMLInputElement).value = "";
       } else {
         const err = await res.json();
-        alert(err.message || "Something went wrong");
+        // alert(err.message || "Something went wrong");
+        toast.error(err.message|| "Something went Wrong!")
       }
     } catch (error) {
-      alert("Upload failed.");
+      // alert("Upload failed.");
+      toast.error("Upload Failed!")
+
     } finally {
       setLoading(false);
     }

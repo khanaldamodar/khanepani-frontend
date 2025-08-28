@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 export default function AddGallery() {
   const searchParams = useSearchParams();
@@ -73,6 +74,7 @@ export default function AddGallery() {
 
       if (res.ok) {
         setSuccess(true);
+        toast.success("Images Added Successfully")
         if (!id) {
           setTitle("");
           setCategory("");
@@ -81,10 +83,12 @@ export default function AddGallery() {
         }
       } else {
         const err = await res.json();
-        alert(err.message || "Failed to save gallery");
+        // alert(err.message || "Failed to save gallery");
+        // toast.error(err.message || "Failed to save gallery")
       }
     } catch (err) {
-      alert("Error saving gallery");
+      // alert("Error saving gallery");
+      toast.error("Error saving gallery")
     } finally {
       setLoading(false);
     }

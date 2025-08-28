@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AddPost() {
   const searchParams = useSearchParams();
@@ -84,6 +85,7 @@ export default function AddPost() {
 
       if (res.ok) {
         setSuccess(true);
+        toast.success("Blog Added Successfully")
         if (!postId) {
           setTitle("");
           setContent("");
@@ -93,17 +95,19 @@ export default function AddPost() {
         }
       } else {
         const err = await res.json();
-        alert(err.message || "Failed to save post");
+        // alert(err.message || "Failed to save post");
+        toast.error(err.message || "Failed to save post")
       }
     } catch (error) {
-      alert("Post save failed.");
+      // alert("Post save failed.");
+      toast.error("Post save failed.")
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-6 bg-white rounded-xl shadow">
+    <div className="max-w-3xl mx-auto py-10 px-6 bg-white rounded-xl shadow font-poppins">
       <h2 className="text-2xl font-bold mb-6">
         {postId ? "Edit Blog Post" : "Write a Blog Post"}
       </h2>

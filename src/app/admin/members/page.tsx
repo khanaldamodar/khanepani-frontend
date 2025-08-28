@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Member {
   id: number;
@@ -57,12 +58,15 @@ export default function MembersList() {
 
       if (res.ok) {
         setMembers((prev) => prev.filter((m) => m.id !== id));
+        toast.success("Member Deleted Successfully")
       } else {
         const err = await res.json();
-        alert(err.message || "Delete failed.");
+        // alert(err.message || "Delete failed.");
+        toast.error(err.message || "Delete failed.");
       }
     } catch (error) {
-      alert("Delete request failed.");
+      // alert("Delete request failed.");
+      toast.error("Delete request failed.");
     }
   };
 

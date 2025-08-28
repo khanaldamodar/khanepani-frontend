@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useSearchParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AddMember() {
   const searchParams = useSearchParams();
@@ -44,7 +45,8 @@ export default function AddMember() {
           // 🔹 Set preview with existing image
           setPreview(process.env.NEXT_PUBLIC_IMAGE_URL + data.photo);
         } catch (error) {
-          alert("Failed to load member details.");
+          // alert("Failed to load member details.");
+          toast.error("Failed to load member details.");
         }
       };
       fetchMember();
@@ -99,6 +101,7 @@ export default function AddMember() {
 
       if (res.ok) {
         setSuccess(true);
+        toast.success("Member added Successfully")
         if (!editId) {
           setForm({
             name: "",
@@ -114,17 +117,19 @@ export default function AddMember() {
         }
       } else {
         const error = await res.json();
-        alert(error.message || "Something went wrong.");
+        // alert(error.message || "Something went wrong.");
+        toast.error(error.message || "Something went wrong.");
       }
     } catch (error) {
-      alert("Failed to save member.");
+      // alert("Failed to save member.");
+      toast.error("Failed to save member.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white shadow-md rounded-xl p-6">
+    <div className="max-w-xl mx-auto mt-10 bg-white shadow-md rounded-xl p-6 font-poppins">
       <h2 className="text-2xl font-bold mb-6 text-center">
         {editId ? "Edit Member" : "Add Member"}
       </h2>

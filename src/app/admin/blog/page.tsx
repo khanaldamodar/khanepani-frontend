@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Post {
   id: number;
@@ -53,6 +54,7 @@ export default function BlogListPage() {
 
       if (res.ok) {
         setPosts((prev) => prev.filter((post) => post.id !== id));
+        toast.success("Blog Deleted Successfully")
       } else {
         const err = await res.json();
         alert(err.message || "Delete failed");

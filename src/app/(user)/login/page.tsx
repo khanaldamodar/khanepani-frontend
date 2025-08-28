@@ -4,6 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Cookie from 'js-cookie';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -18,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!form.email || !form.password) {
-      alert('Please fill in all fields');
+        toast.error('Please fill in all fields');
       return;
     }
 
@@ -39,13 +40,12 @@ export default function LoginPage() {
         Cookie.set('token', data.token, { expires: 1 }); 
       }
 
-      alert('Login successful');
-      // Redirect to dashboard or any page
+      toast.success('Login successful');
       router.push('/admin/dashboard');
 
     } catch (error: any) {
       const message = error.response?.data?.message || 'Login failed';
-      alert(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
