@@ -100,7 +100,7 @@ export default function GalleryList() {
                   {gallery.images.slice(0, 2).map((img, i) => (
                     <img
                       key={i}
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}public/storage/${img}`}
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
                       alt="gallery"
                       className="h-10 w-10 object-cover rounded"
                     />
@@ -111,9 +111,9 @@ export default function GalleryList() {
                 </td>
                 <td className="px-4 py-3">{new Date(gallery.created_at).toLocaleDateString()}</td>
                 <td className="px-4 py-3 flex gap-3">
-                  <button title="View">
+                  {/* <button title="View">
                     <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800" />
-                  </button>
+                  </button> */}
                   <button title="Edit"   onClick={() => router.push(`/admin/gallery/add?id=${gallery.id}`)}>
                     <Pencil className="h-5 w-5 text-yellow-600 hover:text-yellow-800" />
                   </button>

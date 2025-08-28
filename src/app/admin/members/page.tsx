@@ -15,33 +15,34 @@ interface Member {
 }
 
 export default function MembersList() {
-
   const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [filter, setFilter] = useState<"all" | "board" | "staff">("all");
-  const imageUrl = process.env.NEXT_PUBLIC_IMAGE_URL; 
+  const [search, setSearch] = useState(""); // 🔹 search state
+  const imageUrl = process.env.NEXT_PUBLIC_IMAGE_URL;
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL  // Replace with your API URL
-        const token = Cookies.get("token"); // Replace with your token retrieval logic
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const token = Cookies.get("token");
         const res = await fetch(`${apiUrl}members`, {
           headers: {
-            Authorization: `Bearer ${token}`, // Replace with your token
+            Authorization: `Bearer ${token}`,
           },
         });
+        if (!res.ok) throw new Error("Failed to fetch members");
         const data = await res.json();
         setMembers(data);
       } catch (error) {
-        console.error("Failed to fetch members");
+        console.error("Failed to fetch members:", error);
       }
     };
 
     fetchMembers();
   }, []);
 
-   const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this member?")) return;
 
     try {
@@ -65,28 +66,45 @@ export default function MembersList() {
     }
   };
 
-   const handleEdit = (id: number) => {
+  const handleEdit = (id: number) => {
     router.push(`/admin/members/add?id=${id}`);
   };
 
-  const filteredMembers =
-    filter === "all"
-      ? members
-      : members.filter((member) => member.type === filter);
+  // 🔹 Combined filtering: by type + search
+  const filteredMembers = members.filter((member) => {
+    const matchesType = filter === "all" || member.type === filter;
+    const matchesSearch = member.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 font-poppins">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-between justify-between sm:items-center mb-4">
         <h2 className="text-2xl font-bold">Members List</h2>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as any)}
-          className="border px-3 py-1 rounded"
-        >
-          <option value="all">All</option>
-          <option value="board">Board</option>
-          <option value="staff">Staff</option>
-        </select>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* 🔹 Search by name */}
+            <input
+            type="text"
+            placeholder="Search by name..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border px-3 py-1 rounded w-full sm:w-60"
+          />
+
+          {/* 🔹 Filter by type */}
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as any)}
+            className="border px-3 py-1 rounded"
+          >
+            <option value="all">All</option>
+            <option value="board">Board</option>
+            <option value="staff">Staff</option>
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -116,13 +134,16 @@ export default function MembersList() {
                 <td className="px-4 py-3">{member.position}</td>
                 <td className="px-4 py-3 capitalize">{member.type}</td>
                 <td className="px-4 py-3 flex items-center gap-3">
-                  <button title="View">
+                  {/* <button title="View">
                     <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800" />
-                  </button>
+                  </button> */}
                   <button title="Edit" onClick={() => handleEdit(member.id)}>
                     <Pencil className="h-5 w-5 text-yellow-600 hover:text-yellow-800" />
                   </button>
-                  <button title="Delete" onClick={() => handleDelete(member.id)}>
+                  <button
+                    title="Delete"
+                    onClick={() => handleDelete(member.id)}
+                  >
                     <Trash2 className="h-5 w-5 text-red-600 hover:text-red-800" />
                   </button>
                 </td>
@@ -140,7 +161,4 @@ export default function MembersList() {
       </div>
     </div>
   );
-
 }
-
-

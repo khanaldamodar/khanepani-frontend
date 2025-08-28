@@ -32,7 +32,7 @@ export default function AddPost() {
           setTitle(data.title);
           setContent(data.content);
           if (data.image) {
-            setPreviewImage(`${process.env.NEXT_PUBLIC_IMAGE_URL}public/storage/${data.image}`);
+            setPreviewImage(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.image}`);
           }
         } catch (err) {
           console.error("Failed to fetch post data", err);

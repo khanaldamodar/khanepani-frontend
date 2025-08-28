@@ -2,6 +2,7 @@
 
 import ClientAuthGuard from "@/components/global/ClientAuthGuard";
 import AdminSidebar from "@/components/global/sidebar";
+import "../globals.css";
 
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

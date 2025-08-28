@@ -36,11 +36,11 @@ export default function GeneralSettingsPage() {
         setForm(data);
 
         if (data.logo) {
-          setLogoPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}public/storage/${data.logo}`);
+          setLogoPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.logo}`);
         }
 
         if (data.form) {
-          setPdfPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}public/storage/${data.form}`);
+          setPdfPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.form}`);
         }
       } catch (err) {
         console.error("Failed to load settings", err);

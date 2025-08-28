@@ -108,9 +108,9 @@ export default function BlogListPage() {
                   {new Date(post.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-3 flex gap-3">
-                  <button title="View">
+                  {/* <button title="View">
                     <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800" />
-                  </button>
+                  </button> */}
                   <button title="Edit" onClick={() => router.push(`/admin/blog/add?id=${post.id}`)}>
                     <Pencil className="h-5 w-5 text-yellow-600 hover:text-yellow-800" />
                   </button>

@@ -125,7 +125,7 @@ export default function AddGallery() {
             {existingImages.map((img, i) => (
               <img
                 key={i}
-                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}public/storage/${img}`}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
                 alt="existing"
                 className="h-16 w-16 object-cover rounded"
               />

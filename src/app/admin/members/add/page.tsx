@@ -14,9 +14,10 @@ export default function AddMember() {
     number: "",
     position: "",
     type: "board",
-    photo: null as File | null,
+    photo: null as File | null, // for new file
   });
 
+  const [preview, setPreview] = useState<string | null>(null); // 🔹 preview for both edit & upload
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -39,6 +40,9 @@ export default function AddMember() {
             type: data.type,
             photo: null,
           });
+
+          // 🔹 Set preview with existing image
+          setPreview(process.env.NEXT_PUBLIC_IMAGE_URL + data.photo);
         } catch (error) {
           alert("Failed to load member details.");
         }
@@ -47,14 +51,24 @@ export default function AddMember() {
     }
   }, [editId]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      setForm((prev) => ({ ...prev, photo: e.target.files![0] }));
+      const file = e.target.files[0];
+      setForm((prev) => ({ ...prev, photo: file }));
+
+      // 🔹 Create local preview for uploaded image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -69,7 +83,7 @@ export default function AddMember() {
     formData.append("position", form.position);
     formData.append("type", form.type);
     if (form.photo) formData.append("photo", form.photo);
-     if (editId) formData.append("_method", "PUT"); 
+    if (editId) formData.append("_method", "PUT");
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -77,8 +91,7 @@ export default function AddMember() {
       const res = await fetch(
         editId ? `${apiUrl}members/${editId}` : `${apiUrl}members`,
         {
-          method: editId ? "POST" : "POST", // If Laravel expects POST for both, keep as POST, else change to PUT for updates
-          
+          method: "POST", // Laravel expects POST (with _method override)
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         }
@@ -87,7 +100,14 @@ export default function AddMember() {
       if (res.ok) {
         setSuccess(true);
         if (!editId) {
-          setForm({ name: "", number: "", position: "", type: "board", photo: null });
+          setForm({
+            name: "",
+            number: "",
+            position: "",
+            type: "board",
+            photo: null,
+          });
+          setPreview(null);
           (document.getElementById("photo") as HTMLInputElement).value = "";
         } else {
           router.push("/admin/members"); // Redirect after update
@@ -118,23 +138,34 @@ export default function AddMember() {
           required
           className="w-full border px-4 py-2 rounded"
         />
+
+        {/* 🔹 Preview + File Upload */}
+        {preview && (
+          <div className="mb-2 flex justify-center">
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-24 h-24 object-cover rounded-full border"
+            />
+          </div>
+        )}
         <input
           type="file"
           id="photo"
           accept="image/*"
           onChange={handleFileChange}
           className="w-full border px-4 py-2 rounded"
-          // required={!editId} // Make required only for new member
         />
+
         <input
           type="text"
           name="number"
           placeholder="Phone Number"
           value={form.number}
           onChange={handleChange}
-          
           className="w-full border px-4 py-2 rounded"
         />
+
         <input
           type="text"
           name="position"
@@ -144,6 +175,7 @@ export default function AddMember() {
           required
           className="w-full border px-4 py-2 rounded"
         />
+
         <select
           name="type"
           value={form.type}
@@ -153,14 +185,26 @@ export default function AddMember() {
           <option value="board">Board</option>
           <option value="staff">Staff</option>
         </select>
+
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
         >
-          {loading ? (editId ? "Updating..." : "Adding...") : editId ? "Update Member" : "Add Member"}
+          {loading
+            ? editId
+              ? "Updating..."
+              : "Adding..."
+            : editId
+            ? "Update Member"
+            : "Add Member"}
         </button>
-        {success && <p className="text-green-600 text-center mt-2">Saved successfully!</p>}
+
+        {success && (
+          <p className="text-green-600 text-center mt-2">
+            Saved successfully!
+          </p>
+        )}
       </form>
     </div>
   );

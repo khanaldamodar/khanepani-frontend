@@ -89,8 +89,8 @@ const AdminSidebar = () => {
       icon: FileText,
       label: 'Documents',
       submenu: [
-        { icon: Plus, label: 'Add Document', path: '/admin/documents/add' },
-        { icon: List, label: 'All Documents', path: '/admin/documents' }
+        { icon: Plus, label: 'Add Document', path: '/admin/document/add' },
+        { icon: List, label: 'All Documents', path: '/admin/document' }
       ]
     },
     {

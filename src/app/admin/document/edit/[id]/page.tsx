@@ -131,7 +131,7 @@ export default function EditDocumentPage() {
           />
           {currentFile && (
             <a
-              href={`${process.env.NEXT_PUBLIC_IMAGE_URL}storage/${currentFile}`}
+              href={`${process.env.NEXT_PUBLIC_IMAGE_URL}${currentFile}`}
               target="_blank"
               className="text-sm text-blue-600 underline block mt-1"
             >
