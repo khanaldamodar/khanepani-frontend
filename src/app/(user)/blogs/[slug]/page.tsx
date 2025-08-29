@@ -38,7 +38,7 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
   }
   const baseUrl = process.env.NEXT_PUBLIC_IMAGE_URL 
   const imageUrl = blog.image
-    ? `${baseUrl}public/storage/${blog.image}`
+    ? `${baseUrl}${blog.image}`
     : "/default-image.jpg";
 
   return (
