@@ -121,6 +121,14 @@ const AdminSidebar = () => {
       ]
     },
     {
+      key: 'contact',
+      icon: Users,
+      label: 'Contacts',
+      submenu: [
+        { icon: List, label: 'All Contacts', path: '/admin/contacts' }
+      ]
+    },
+    {
       key: 'settings',
       icon: Settings,
       label: 'Settings',
