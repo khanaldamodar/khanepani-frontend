@@ -102,6 +102,9 @@ export default function GeneralSettingsPage() {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+          "Accept": "application/json",
+
         },
         body: formData,
       });
