@@ -4,9 +4,9 @@ import { useState } from "react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
+    first_name: "",
+    last_name: "",
+    phone_number: "",
     email: "",
     message: "",
   });
@@ -24,24 +24,25 @@ export default function ContactPage() {
     setLoading(true);
 
     // ✅ Optional: Send to backend API
-    // try {
-    //   const res = await fetch("http://localhost:8000/api/contact", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(form),
-    //   });
-    //   if (!res.ok) throw new Error("Failed");
-    //   setSuccess(true);
-    //   setForm({ firstName: "", lastName: "", phone: "", email: "", message: "" });
-    // } catch (err) {
-    //   alert("Failed to send message.");
-    // }
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}contacts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setSuccess(true);
+      setForm({ first_name: "", last_name: "", phone_number: "", email: "", message: "" });
+    } catch (err) {
+      alert("Failed to send message.");
+    }
 
     setTimeout(() => {
       setSuccess(true);
-      setForm({ firstName: "", lastName: "", phone: "", email: "", message: "" });
+      setForm({ first_name: "", last_name: "", phone_number: "", email: "", message: "" });
       setLoading(false);
     }, 1000); // Fake delay for demo
   };
@@ -56,8 +57,8 @@ export default function ContactPage() {
             <label className="block font-medium mb-1">First Name *</label>
             <input
               type="text"
-              name="firstName"
-              value={form.firstName}
+              name="first_name"
+              value={form.first_name}
               onChange={handleChange}
               required
               placeholder="Enter your first name"
@@ -65,11 +66,11 @@ export default function ContactPage() {
             />
           </div>
           <div className="w-1/2">
-            <label className="block font-medium mb-1">Last Name *</label>
+            <label className="block font-medium mb-1">Last Name</label>
             <input
               type="text"
-              name="lastName"
-              value={form.lastName}
+              name="last_name"
+              value={form.last_name}
               onChange={handleChange}
               required
               placeholder="Enter your last name"
@@ -82,17 +83,17 @@ export default function ContactPage() {
           <label className="block font-medium mb-1">Phone *</label>
           <input
             type="tel"
-            name="phone"
-            value={form.phone}
+            name="phone_number"
+            value={form.phone_number}
             onChange={handleChange}
             required
-            placeholder="Enter your phone number"
+            placeholder="Enter your phone_number number"
             className="w-full border px-4 py-2 rounded"
           />
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Email *</label>
+          <label className="block font-medium mb-1">Email</label>
           <input
             type="email"
             name="email"

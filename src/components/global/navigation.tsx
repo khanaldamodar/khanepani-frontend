@@ -1,6 +1,7 @@
 // components/NavbarClient.tsx
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ChevronDown, Menu, X, Search, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,8 @@ export default function Navbar({ data }: { data: NavbarData }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const toggleDropdown = (menu: string) => {
     setOpenMenu(openMenu === menu ? "" : menu);
   };
@@ -28,28 +31,37 @@ export default function Navbar({ data }: { data: NavbarData }) {
     setOpenMenu("");
   };
 
-const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!searchQuery.trim()) return;
     router.push(`/search?keyword=${encodeURIComponent(searchQuery.trim())}`);
   };
 
   const handleDownload = () => {
-    router.push(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.form}`)
-
+    router.push(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.form}`);
   };
+
+  // CLOSE DROPDOWN WHEN CLICKING OUTSIDE
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenMenu("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
   return (
     <div className="w-full border-b shadow-sm bg-white font-poppins relative">
       {/* Header Section */}
       <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
-        {/* Logo and Organization Info */}
         <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-          <img 
-            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.logo}`} 
-            alt="Logo" 
-            className="h-12 w-12 sm:h-14 sm:w-14 object-contain flex-shrink-0" 
+          <img
+            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.logo}`}
+            alt="Logo"
+            className="h-12 w-12 sm:h-14 sm:w-14 object-contain flex-shrink-0"
           />
           <div className="min-w-0 flex-1">
             <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
@@ -61,9 +73,9 @@ const handleSearch = (e: React.FormEvent) => {
           </div>
         </div>
 
-        {/* Right Side Actions - Desktop */}
+        {/* Desktop Right Side */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Search Bar */}
+          {/* Search */}
           <div className="relative">
             {showSearch ? (
               <form onSubmit={handleSearch} className="flex items-center">
@@ -72,13 +84,13 @@ const handleSearch = (e: React.FormEvent) => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                  className="px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 w-64"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowSearch(false)}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X size={16} />
                 </button>
@@ -86,18 +98,17 @@ const handleSearch = (e: React.FormEvent) => {
             ) : (
               <button
                 onClick={() => setShowSearch(true)}
-                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-md transition-colors"
-                title="Search"
+                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-md"
               >
                 <Search size={20} />
               </button>
             )}
           </div>
 
-          {/* Download Button */}
+          {/* Download */}
           <button
             onClick={handleDownload}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
           >
             <Download size={16} />
             Download Form
@@ -107,39 +118,45 @@ const handleSearch = (e: React.FormEvent) => {
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors ml-2"
-          aria-label="Toggle mobile menu"
+          className="md:hidden p-2 rounded-md hover:bg-gray-100 ml-2"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Desktop Navigation Bar */}
+      {/* Desktop Navigation */}
       <nav className="hidden md:flex gap-6 px-6 py-3 border-t text-sm font-medium bg-blue-600 text-white">
-        <Link href="/" className="hover:text-blue-200 transition-colors">
+        <Link href="/" className="hover:text-blue-200">
           Home
         </Link>
 
-        <div className="relative group">
+        {/* ABOUT US */}
+        <div className="relative flex items-center gap-1" ref={dropdownRef}>
+          {/* Text → go to /about */}
+          <Link href="/about" className="hover:text-blue-200">
+            About Us
+          </Link>
+
+          {/* Arrow → open dropdown */}
           <button
             onClick={() => toggleDropdown("about")}
-            className="flex items-center gap-1 hover:text-blue-200 transition-colors"
+            className="hover:text-blue-200"
           >
-            About Us <ChevronDown size={14} />
+            <ChevronDown size={14} />
           </button>
+
+          {/* Dropdown */}
           {openMenu === "about" && (
-            <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md z-20 border">
+            <div className="absolute left-0 top-8 w-48 bg-blue-600 shadow-lg rounded-md z-20 border">
               <Link
                 href="/members/board-members"
-                className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                onClick={() => setOpenMenu("")}
+                className="block px-4 py-3 text-white  hover:text-blue-200"
               >
                 Board Members
               </Link>
               <Link
                 href="/members/staffs"
-                className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors border-t"
-                onClick={() => setOpenMenu("")}
+                className="block px-4 py-3 text-white  hover:text-blue-200 border-t"
               >
                 Staffs
               </Link>
@@ -147,30 +164,31 @@ const handleSearch = (e: React.FormEvent) => {
           )}
         </div>
 
-        <Link href="/resources/notices" className="hover:text-blue-200 transition-colors">
+        <Link href="/resources/notices" className="hover:text-blue-200">
           Notices
         </Link>
 
-        <div className="relative group">
+        {/* RESOURCES */}
+        <div className="relative flex items-center gap-1" ref={dropdownRef}>
+          <span className="cursor-pointer hover:text-blue-200">Resources</span>
           <button
             onClick={() => toggleDropdown("resources")}
-            className="flex items-center gap-1 hover:text-blue-200 transition-colors"
+            className="hover:text-blue-200"
           >
-            Resources <ChevronDown size={14} />
+            <ChevronDown size={14} />
           </button>
+
           {openMenu === "resources" && (
-            <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md z-20 border">
+            <div className="absolute left-0 top-10 w-48 bg-blue-600 shadow-lg rounded-md border z-20">
               <Link
                 href="/resources/reports"
-                className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                onClick={() => setOpenMenu("")}
+                className="block px-4 py-3  text-white hover:text-blue-200"
               >
                 Reports
               </Link>
               <Link
                 href="/resources/downloads"
-                className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors border-t"
-                onClick={() => setOpenMenu("")}
+                className="block px-4 py-3 text-white border-t hover:text-blue-200"
               >
                 Downloads
               </Link>
@@ -178,163 +196,140 @@ const handleSearch = (e: React.FormEvent) => {
           )}
         </div>
 
-        <Link href="/gallery" className="hover:text-blue-200 transition-colors">
+        <Link href="/gallery" className="hover:text-blue-200">
           Gallery
         </Link>
-        <Link href="/blogs" className="hover:text-blue-200 transition-colors">
+        <Link href="/blogs" className="hover:text-blue-200">
           Blogs
         </Link>
-        <Link href="/contact" className="hover:text-blue-200 transition-colors">
+        <Link href="/contact" className="hover:text-blue-200">
           Contact Us
         </Link>
       </nav>
 
-      {/* Mobile Navigation Menu */}
+      {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-blue-600 border-t absolute top-full left-0 right-0 z-30 shadow-lg">
           <div className="px-4 py-3 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-            {/* Mobile Search */}
-            <div className="pb-3 border-b border-blue-500">
-              <form onSubmit={handleSearch} className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className="w-full px-3 py-2 text-sm border border-blue-400 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent bg-white"
-                  />
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                </div>
-              </form>
-              {/* Mobile Download Button */}
-              <button
-                onClick={handleDownload}
-                className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-blue-50 transition-colors text-sm font-medium"
-              >
-                <Download size={16} />
-                Download Form
-              </button>
-            </div>
 
-            {/* Navigation Links */}
-            <Link
-              href="/"
-              className="block px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              onClick={closeMobileMenu}
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="w-full px-3 py-2 text-sm border border-blue-400 rounded-md bg-white"
+                />
+              </div>
+            </form>
+
+            <button
+              onClick={handleDownload}
+              className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-white text-blue-600 rounded-md text-sm"
             >
+              <Download size={16} />
+              Download Form
+            </button>
+
+            <Link href="/" className="block px-3 py-2 text-white" onClick={closeMobileMenu}>
               Home
             </Link>
 
-            {/* Mobile About Us Dropdown */}
-            <div>
-              <button
-                onClick={() => toggleDropdown("about")}
-                className="flex items-center justify-between w-full px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              >
-                About Us
-                <ChevronDown 
-                  size={16} 
-                  className={`transform transition-transform duration-200 ${
-                    openMenu === "about" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div className={`overflow-hidden transition-all duration-300 ${
-                openMenu === "about" ? "max-h-32 opacity-100" : "max-h-0 opacity-0"
-              }`}>
-                <div className="ml-4 mt-1 space-y-1">
+            {/* MOBILE ABOUT */}
+            <div className="bg-blue-700 rounded-md">
+              <div className="flex justify-between items-center">
+                <Link
+                  href="/about"
+                  onClick={closeMobileMenu}
+                  className="px-3 py-2 text-white flex-1"
+                >
+                  About Us
+                </Link>
+                <button
+                  onClick={() => toggleDropdown("about")}
+                  className="px-3 py-2 text-white"
+                >
+                  <ChevronDown
+                    size={16}
+                    className={`${openMenu === "about" ? "rotate-180" : ""}`}
+                  />
+                </button>
+              </div>
+
+              {openMenu === "about" && (
+                <div className="ml-4 space-y-1 py-2">
                   <Link
                     href="/members/board-members"
-                    className="block px-3 py-2 text-blue-100 hover:bg-blue-700 rounded-md transition-colors text-sm"
                     onClick={closeMobileMenu}
+                    className="block text-blue-100 px-3 py-2"
                   >
                     Board Members
                   </Link>
                   <Link
                     href="/members/staffs"
-                    className="block px-3 py-2 text-blue-100 hover:bg-blue-700 rounded-md transition-colors text-sm"
                     onClick={closeMobileMenu}
+                    className="block text-blue-100 px-3 py-2"
                   >
                     Staffs
                   </Link>
                 </div>
-              </div>
+              )}
             </div>
 
-            <Link
-              href="/resources/notices"
-              className="block px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              onClick={closeMobileMenu}
-            >
-              Notices
-            </Link>
+            {/* MOBILE RESOURCES */}
+            <div className="bg-blue-700 rounded-md">
+              <div className="flex justify-between items-center">
+                <span className="px-3 py-2 text-white flex-1">Resources</span>
+                <button
+                  onClick={() => toggleDropdown("resources")}
+                  className="px-3 py-2 text-white"
+                >
+                  <ChevronDown
+                    size={16}
+                    className={`${openMenu === "resources" ? "rotate-180" : ""}`}
+                  />
+                </button>
+              </div>
 
-            {/* Mobile Resources Dropdown */}
-            <div>
-              <button
-                onClick={() => toggleDropdown("resources")}
-                className="flex items-center justify-between w-full px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              >
-                Resources
-                <ChevronDown 
-                  size={16} 
-                  className={`transform transition-transform duration-200 ${
-                    openMenu === "resources" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div className={`overflow-hidden transition-all duration-300 ${
-                openMenu === "resources" ? "max-h-32 opacity-100" : "max-h-0 opacity-0"
-              }`}>
-                <div className="ml-4 mt-1 space-y-1">
+              {openMenu === "resources" && (
+                <div className="ml-4 space-y-1 py-2">
                   <Link
                     href="/resources/reports"
-                    className="block px-3 py-2 text-blue-100 hover:bg-blue-700 rounded-md transition-colors text-sm"
                     onClick={closeMobileMenu}
+                    className="block text-blue-100 px-3 py-2"
                   >
                     Reports
                   </Link>
                   <Link
                     href="/resources/downloads"
-                    className="block px-3 py-2 text-blue-100 hover:bg-blue-700 rounded-md transition-colors text-sm"
                     onClick={closeMobileMenu}
+                    className="block text-blue-100 px-3 py-2"
                   >
                     Downloads
                   </Link>
                 </div>
-              </div>
+              )}
             </div>
 
-            <Link
-              href="/gallery"
-              className="block px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              onClick={closeMobileMenu}
-            >
+            <Link href="/gallery" className="block px-3 py-2 text-white" onClick={closeMobileMenu}>
               Gallery
             </Link>
-            <Link
-              href="/blogs"
-              className="block px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              onClick={closeMobileMenu}
-            >
+            <Link href="/blogs" className="block px-3 py-2 text-white" onClick={closeMobileMenu}>
               Blogs
             </Link>
-            <Link
-              href="/contact"
-              className="block px-3 py-2 text-white hover:bg-blue-700 rounded-md transition-colors"
-              onClick={closeMobileMenu}
-            >
+            <Link href="/contact" className="block px-3 py-2 text-white" onClick={closeMobileMenu}>
               Contact Us
             </Link>
           </div>
         </div>
       )}
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Background Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0  bg-opacity-25 z-20 md:hidden"
+          className="fixed inset-0 bg-black/20 z-20 md:hidden"
           onClick={closeMobileMenu}
         />
       )}

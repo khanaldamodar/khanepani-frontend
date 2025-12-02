@@ -1,11 +1,15 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Users, Target, Heart, Award } from "lucide-react"
+import { Button } from "../ui/button"
+import { useRouter } from "next/navigation"
 
 const AboutUs = () => {
   const [aboutUs, setAboutUs] = useState<string>("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchAboutUs = async () => {
@@ -21,7 +25,7 @@ const AboutUs = () => {
         const data = await response.json()
         setAboutUs(
           data.about ||
-            "We are passionate about creating exceptional experiences and building meaningful connections with our community.",
+          "We are passionate about creating exceptional experiences and building meaningful connections with our community.",
         )
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong")
@@ -67,7 +71,8 @@ const AboutUs = () => {
         {/* Main Content */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div className="space-y-6">
-            <p className="text-lg leading-relaxed text-slate-700 font-medium">{aboutUs}</p>
+            <p className="text-lg leading-relaxed text-slate-700 font-medium">{aboutUs.slice(0, 600)}</p>
+            <Button className="bg-blue-600 text-white cursor-pointer" variant={'outline'} onClick={() => router.push('/about')}>Read more... </Button>
 
             {error && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">

@@ -10,14 +10,15 @@ export default function GeneralSettingsPage() {
     email: "",
     phone: "",
     facebook: "",
-    twitter: ""
+    twitter: "",
+    about:""
   });
 
   const [logo, setLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-   const [pdf, setPdf] = useState<File | null>(null); // ✅ new state
+  const [pdf, setPdf] = useState<File | null>(null); // ✅ new state
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
 
   // 🔁 Fetch existing settings on page load
@@ -61,7 +62,7 @@ export default function GeneralSettingsPage() {
       setLogoPreview(URL.createObjectURL(file));
     }
   };
-    const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setPdf(file);
@@ -80,7 +81,7 @@ export default function GeneralSettingsPage() {
       setLoading(false);
     }, 1500);
 
-  
+
     const formData = new FormData();
     formData.append("_method", "PUT");
     formData.append("name", form.name);
@@ -89,14 +90,16 @@ export default function GeneralSettingsPage() {
     formData.append("phone", form.phone);
     formData.append("facebook", form.facebook);
     formData.append("twitter", form.twitter);
+    formData.append("about", form.about);
+
     if (logo) formData.append("logo", logo);
     if (pdf) formData.append("form", pdf);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL; 
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const token = Cookie.get("token");
       const res = await fetch(`${apiUrl}settings`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -114,7 +117,7 @@ export default function GeneralSettingsPage() {
     } finally {
       setLoading(false);
     }
-   
+
   };
 
   return (
@@ -130,7 +133,7 @@ export default function GeneralSettingsPage() {
 
 
 
-          
+
           <div className="p-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column */}
@@ -226,7 +229,7 @@ export default function GeneralSettingsPage() {
                     placeholder="Enter phone number"
                   />
                 </div>
-                 {/* PDF Upload */}
+                {/* PDF Upload */}
                 <div className="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors">
                   <label className=" text-sm font-semibold text-gray-700 mb-3 flex items-center">
                     <FileText className="mr-2" size={18} />
@@ -253,6 +256,25 @@ export default function GeneralSettingsPage() {
                 </div>
               </div>
             </div>
+
+            {/* About Section */}
+            <div className="mt-10">
+              <div className="flex items-center mb-6">
+                <div className="h-px bg-gray-300 flex-1"></div>
+                <h3 className="px-4 text-lg font-semibold text-gray-700">About Company</h3>
+                <div className="h-px bg-gray-300 flex-1"></div>
+              </div>
+
+              <textarea
+                name="about"
+                value={form.about}
+                onChange={(e) => setForm({ ...form, about: e.target.value })}
+                rows={6}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors bg-white shadow-sm resize-none"
+                placeholder="Write a short description about the company..."
+              ></textarea>
+            </div>
+
 
             {/* Social Media Section */}
             <div className="mt-10">
@@ -306,14 +328,14 @@ export default function GeneralSettingsPage() {
                     Settings updated successfully!
                   </div>
                 )}
-                
+
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
                   className={`
                     flex items-center px-8 py-3 rounded-lg font-semibold text-white transition-all duration-200 shadow-lg
-                    ${loading 
-                      ? 'bg-gray-400 cursor-not-allowed' 
+                    ${loading
+                      ? 'bg-gray-400 cursor-not-allowed'
                       : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl transform hover:scale-105'
                     }
                   `}
