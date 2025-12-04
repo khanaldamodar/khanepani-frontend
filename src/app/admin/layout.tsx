@@ -3,6 +3,16 @@
 import ClientAuthGuard from "@/components/global/ClientAuthGuard";
 import AdminSidebar from "@/components/global/sidebar";
 import "../globals.css";
+import { Metadata } from "next";
+
+
+export const metadata: Metadata = {
+  title: "गगनगौडा भू.पु. खानेपानी समिती",
+  description: "गगनगौडा भू.पु. खानेपानी समिती",
+  icons:{
+    icon: '/image.png'
+  }
+};
 
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -3,9 +3,13 @@ import { useEffect, useState } from "react"
 import { Users, Target, Heart, Award } from "lucide-react"
 import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
+import Loader from "../global/Loader"
 
 const AboutUs = () => {
   const [aboutUs, setAboutUs] = useState<string>("")
+  const [mission, setMission] = useState<string>("")
+  const [commitment, setCommitment] = useState<string>("")
+  const [values, setValues] = useState<string>("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,6 +31,12 @@ const AboutUs = () => {
           data.about ||
           "We are passionate about creating exceptional experiences and building meaningful connections with our community.",
         )
+        setMission(data.vision || "Delivering excellence in everything we do")
+        setValues(data.values || "Integrity, Innovation, Customer-Centricity, Collaboration, Excellence")
+        setCommitment(
+          data.commitment ||
+          "Building lasting relationships through exceptional service and continuous improvement",
+        )
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong")
         // Fallback content
@@ -44,7 +54,7 @@ const AboutUs = () => {
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader/>
       </div>
     )
   }
@@ -90,7 +100,7 @@ const AboutUs = () => {
                 <Target className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Our Mission</h3>
-              <p className="text-sm text-slate-600">Delivering excellence in everything we do</p>
+              <p className="text-sm text-slate-600">{mission}</p>
             </div>
 
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -98,7 +108,7 @@ const AboutUs = () => {
                 <Heart className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Our Values</h3>
-              <p className="text-sm text-slate-600">Integrity, innovation, and community first</p>
+              <p className="text-sm text-slate-600">{values}</p>
             </div>
 
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 col-span-2">
@@ -107,7 +117,7 @@ const AboutUs = () => {
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Our Commitment</h3>
               <p className="text-sm text-slate-600">
-                Building lasting relationships through exceptional service and continuous improvement
+                {commitment}
               </p>
             </div>
           </div>

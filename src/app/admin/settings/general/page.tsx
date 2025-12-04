@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Upload, User, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Save, Check, FileText } from "lucide-react";
 import Cookie from "js-cookie";
 export default function GeneralSettingsPage() {
+  const LIMIT = 255;
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -11,7 +12,10 @@ export default function GeneralSettingsPage() {
     phone: "",
     facebook: "",
     twitter: "",
-    about:""
+    about: "",
+    mission: "",
+    values: "",
+    commitment: "",
   });
 
   const [logo, setLogo] = useState<File | null>(null);
@@ -91,6 +95,9 @@ export default function GeneralSettingsPage() {
     formData.append("facebook", form.facebook);
     formData.append("twitter", form.twitter);
     formData.append("about", form.about);
+    formData.append("mission", form.mission || "");
+    formData.append("values", form.values || "");
+    formData.append("commitment", form.commitment || "");
 
     if (logo) formData.append("logo", logo);
     if (pdf) formData.append("form", pdf);
@@ -99,12 +106,11 @@ export default function GeneralSettingsPage() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const token = Cookie.get("token");
       const res = await fetch(`${apiUrl}settings`, {
-        method: "PUT",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          // "Content-Type": "multipart/form-data",
           "Accept": "application/json",
-
         },
         body: formData,
       });
@@ -277,6 +283,65 @@ export default function GeneralSettingsPage() {
                 placeholder="Write a short description about the company..."
               ></textarea>
             </div>
+
+
+            {/* Mission */}
+            <div className="mt-6">
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                Mission (max 255 chars)
+              </label>
+              <textarea
+                name="mission"
+                value={form.mission || ""}
+                maxLength={LIMIT}
+                onChange={(e) => setForm({ ...form, mission: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white shadow-sm resize-none"
+                placeholder="Our company mission..."
+              ></textarea>
+              <p className="text-right text-sm text-gray-500">
+                {(form.mission?.length || 0)} / {LIMIT}
+              </p>
+            </div>
+
+            {/* Values */}
+            <div className="mt-6">
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                Values (max 255 chars)
+              </label>
+              <textarea
+                name="values"
+                value={form.values || ""}
+                maxLength={LIMIT}
+                onChange={(e) => setForm({ ...form, values: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white shadow-sm resize-none"
+                placeholder="Our core values..."
+              ></textarea>
+              <p className="text-right text-sm text-gray-500">
+                {(form.values?.length || 0)} / {LIMIT}
+              </p>
+            </div>
+
+            {/* Commitment */}
+            <div className="mt-6">
+              <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                Commitment (max 255 chars)
+              </label>
+              <textarea
+                name="commitment"
+                value={form.commitment || ""}
+                maxLength={LIMIT}
+                onChange={(e) => setForm({ ...form, commitment: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white shadow-sm resize-none"
+                placeholder="Our company commitment..."
+              ></textarea>
+              <p className="text-right text-sm text-gray-500">
+                {(form.commitment?.length || 0)} / {LIMIT}
+              </p>
+            </div>
+
 
 
             {/* Social Media Section */}
