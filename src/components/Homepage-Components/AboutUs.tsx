@@ -31,7 +31,7 @@ const AboutUs = () => {
           data.about ||
           "We are passionate about creating exceptional experiences and building meaningful connections with our community.",
         )
-        setMission(data.vision || "Delivering excellence in everything we do")
+        setMission(data.mission || "Delivering excellence in everything we do")
         setValues(data.values || "Integrity, Innovation, Customer-Centricity, Collaboration, Excellence")
         setCommitment(
           data.commitment ||

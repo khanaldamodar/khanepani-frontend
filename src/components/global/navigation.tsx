@@ -20,7 +20,10 @@ export default function Navbar({ data }: { data: NavbarData }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);
+
 
   const toggleDropdown = (menu: string) => {
     setOpenMenu(openMenu === menu ? "" : menu);
@@ -44,7 +47,12 @@ export default function Navbar({ data }: { data: NavbarData }) {
   // CLOSE DROPDOWN WHEN CLICKING OUTSIDE
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        aboutRef.current &&
+        !aboutRef.current.contains(e.target as Node) &&
+        resourcesRef.current &&
+        !resourcesRef.current.contains(e.target as Node)
+      ) {
         setOpenMenu("");
       }
     };
@@ -52,6 +60,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
+
 
   return (
     <div className="w-full border-b shadow-sm bg-white font-poppins relative">
@@ -131,7 +140,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
         </Link>
 
         {/* ABOUT US */}
-        <div className="relative flex items-center gap-1" ref={dropdownRef}>
+        <div className="relative flex items-center gap-1" ref={aboutRef}>
           {/* Text → go to /about */}
           <Link href="/about" className="hover:text-blue-200">
             About Us
@@ -169,7 +178,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
         </Link>
 
         {/* RESOURCES */}
-        <div className="relative flex items-center gap-1" ref={dropdownRef}>
+        <div className="relative flex items-center gap-1" ref={resourcesRef}>
           <span className="cursor-pointer hover:text-blue-200">Resources</span>
           <button
             onClick={() => toggleDropdown("resources")}
