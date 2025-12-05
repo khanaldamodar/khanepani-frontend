@@ -23,12 +23,12 @@ const MemberCard: React.FC<MemberCardProps> = ({ photo, name, number, position }
             src={imageUrl}
             alt={name}
             onClick={() => setOpen(true)}
-            className="w-48 h-60 object-cover rounded transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+            className="w-40 h-40 object-fit rounded transition-transform duration-300 group-hover:scale-105 cursor-pointer"
           />
         </div>
 
         {/* CONTENT */}
-        <div className="p-5 text-center">
+        <div className="p-5 text-center flex flex-col items-center gap-0">
           <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600">
             {name}
           </h3>

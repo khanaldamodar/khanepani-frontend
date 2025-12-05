@@ -71,10 +71,12 @@ const GalleryWithMembers = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 lg:gap-12 items-stretch">
+
           {/* Gallery Slider */}
           <div className="xl:col-span-2">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
+
               {/* <div className="p-6 border-b border-slate-100">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
                   <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
@@ -88,7 +90,8 @@ const GalleryWithMembers = () => {
                   Loading...
                 </div>
               ) : (
-                <div className="relative">
+                <div className="relative flex-1">
+
                   <Swiper
                     spaceBetween={0}
                     slidesPerView={1}
@@ -116,8 +119,9 @@ const GalleryWithMembers = () => {
                               <img
                                 src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
                                 alt={item.title}
-                                className="w-full h-80 sm:h-96 lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                                className="w-full h-48 sm:h-64 md:h-80 lg:h-[500px] xl:h-[540px] object-cover transition-transform duration-700 group-hover:scale-105"
                               />
+
                               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
                               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
@@ -144,7 +148,8 @@ const GalleryWithMembers = () => {
 
           {/* Board Members */}
           <div className="xl:col-span-1">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-fit">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
+
               {/* <div className="p-6 border-b border-slate-100">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
                   <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
@@ -152,7 +157,8 @@ const GalleryWithMembers = () => {
                 </h2>
               </div> */}
 
-              <div className="p-6">
+              <div className="p-6 overflow-y-auto flex-1">
+
                 {loadingMembers ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -172,17 +178,19 @@ const GalleryWithMembers = () => {
                     <p className="text-slate-500 font-medium">No board members found</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="flex flex-col justify-center gap-6 h-full">
+
+
                     {boardMembers.map((member, index) => (
                       <div
                         key={member.id}
-                        className="group relative bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-4 hover:shadow-lg transition-all duration-300 border border-slate-100 hover:border-blue-200"
+                        className="group relative bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-slate-100 hover:border-blue-200 min-h-[120px]"
                         style={{
                           animationDelay: `${index * 100}ms`,
                         }}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="relative">
+                          <div className="relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
                             <img
                               src={
                                 member.photo
@@ -190,19 +198,18 @@ const GalleryWithMembers = () => {
                                   : "/professional-headshot.png"
                               }
                               alt={member.name}
-                              className="w-16 h-16 object-cover rounded-full border-3 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-contain rounded-full border-2 sm:border-3 border-white shadow-lg group-hover:scale-105 transition-transform duration-300 bg-[#CADCE4]"
                             />
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white"></div>
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full border-2 border-white"></div>
                           </div>
-
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-blue-700 transition-colors">
+                            <h3 className="font-bold text-slate-800 text-sm sm:text-base md:text-lg truncate group-hover:text-blue-700 transition-colors">
                               {member.name}
                             </h3>
-                            <p className="text-blue-600 font-medium text-sm mb-1">{member.position}</p>
+                            <p className="text-blue-600 font-medium text-xs sm:text-sm md:text-sm mb-1">{member.position}</p>
                             {member.number && (
-                              <p className="text-slate-500 text-xs flex items-center gap-1">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <p className="text-slate-500 text-xs flex items-center gap-1 sm:text-sm">
+                                <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -215,6 +222,7 @@ const GalleryWithMembers = () => {
                             )}
                           </div>
                         </div>
+
                       </div>
                     ))}
                   </div>
