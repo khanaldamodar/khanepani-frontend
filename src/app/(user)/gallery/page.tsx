@@ -14,6 +14,8 @@ export default function GalleryPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
 
   const openLightbox = (index: number) => {
     setPhotoIndex(index);
@@ -36,11 +38,21 @@ export default function GalleryPage() {
         }
       } catch (error) {
         console.error("Error fetching gallery items:", error);
+      } finally {
+        setLoading(false)
       }
     };
 
     fetchGalleryItems();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const getFullImageUrl = (imgPath: string) => {
     const baseUrl = process.env.NEXT_PUBLIC_IMAGE_URL;

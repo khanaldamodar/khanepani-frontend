@@ -48,7 +48,6 @@ const Compositions = () => {
     };
   }, []);
 
-  // ✅ Memoized formatted blogs to avoid hydration mismatch
   const formattedBlogs = useMemo(
     () =>
       blogs.map((blog) => ({
@@ -61,6 +60,11 @@ const Compositions = () => {
       })),
     [blogs]
   );
+
+
+  if (!loading && (blogs.length === 0 || error)) {
+    return null;
+  }
 
   const renderState = () => {
     if (loading) {
@@ -93,18 +97,18 @@ const Compositions = () => {
       );
     }
 
-    if (formattedBlogs.length === 0) {
-      return (
-        <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <p className="text-gray-600 font-medium text-lg">No compositions available</p>
-        </div>
-      );
-    }
+    // if (formattedBlogs.length === 0) {
+    //   return (
+    //     <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
+    //       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+    //         <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    //         </svg>
+    //       </div>
+    //       <p className="text-gray-600 font-medium text-lg">No compositions available</p>
+    //     </div>
+    //   );
+    // }
 
     return (
       <Swiper
@@ -177,15 +181,8 @@ const Compositions = () => {
 
       <div className="relative z-10">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-blue-200 p-3 rounded-full shadow-lg">
-              <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold mb-2">लेख / रचनाहरु</h1>
-          <p className="text-lg font-medium">Literary Compositions & Blogs</p>
+          <h1 className="text-3xl font-bold mb-2">लेख / रचनाहरु</h1>
+          <p className="text-md font-medium">Literary Compositions & Blogs</p>
         </div>
 
         {renderState()}

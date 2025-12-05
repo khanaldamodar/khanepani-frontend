@@ -32,7 +32,7 @@ const GalleryWithMembers = () => {
   const [loadingGallery, setLoadingGallery] = useState(true)
   const [loadingMembers, setLoadingMembers] = useState(true)
 
- useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -50,7 +50,7 @@ const GalleryWithMembers = () => {
         const filteredMembers = membersData.filter(
           (m) => m.type === "board" && ["अध्यक्ष", "उपाध्याक्ष", "सचिब"].includes(m.position)
         )
-        console.log("Filtered Members:",filteredMembers)
+        console.log("Filtered Members:", filteredMembers)
 
         setGalleryItems(galleryData)
         setLoadingGallery(false)
@@ -67,20 +67,20 @@ const GalleryWithMembers = () => {
   }, [])
 
   return (
-    <div className="min-h-screen  py-5 px-4 sm:px-6 lg:px-8 font-poppins">
+    <div className="py-5 px-4 sm:px-6 lg:px-8 font-poppins">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-      
+
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 lg:gap-12">
           {/* Gallery Slider */}
           <div className="xl:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
+              {/* <div className="p-6 border-b border-slate-100">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
                   <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
                   Photo Gallery
                 </h2>
-              </div>
+              </div> */}
 
               {loadingGallery ? (
                 <div className="h-96 flex items-center justify-center">
@@ -94,7 +94,7 @@ const GalleryWithMembers = () => {
                     slidesPerView={1}
                     loop={true}
                     autoplay={{
-                      delay: 8000,
+                      delay: 2000,
                       disableOnInteraction: false,
                     }}
                     pagination={{
@@ -107,35 +107,35 @@ const GalleryWithMembers = () => {
                     modules={[Autoplay, Pagination, EffectFade]}
                     className="gallery-swiper"
                   >
-                    {galleryItems.flatMap((item) =>
-                      item.images.map((img, index) => (
-                        <SwiperSlide key={`${item.id}-${index}`}>
-                          <div className="relative group">
-                            <img
-                              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
-                              alt={item.title}
-                              className="w-full h-80 sm:h-96 lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                            {/* Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    {galleryItems
+                      .filter((item) => item.category === "banner")
+                      .flatMap((item) =>
+                        item.images.map((img, index) => (
+                          <SwiperSlide key={`${item.id}-${index}`}>
+                            <div className="relative group">
+                              <img
+                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
+                                alt={item.title}
+                                className="w-full h-80 sm:h-96 lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
-                            {/* Content Overlay */}
-                            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-                              <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold mb-2 drop-shadow-lg">
-                                  {item.title}
-                                </h3>
-                                {item.category && (
+                              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                                <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                  <h3 className="text-white text-xl sm:text-2xl lg:text-3xl font-bold mb-2 drop-shadow-lg">
+                                    {item.title}
+                                  </h3>
                                   <span className="inline-block bg-blue-600/90 text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm">
-                                    {item.category}
+                                    Banner
                                   </span>
-                                )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </SwiperSlide>
-                      )),
-                    )}
+                          </SwiperSlide>
+                        ))
+                      )
+                    }
+
                   </Swiper>
                 </div>
               )}
@@ -145,12 +145,12 @@ const GalleryWithMembers = () => {
           {/* Board Members */}
           <div className="xl:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-fit">
-              <div className="p-6 border-b border-slate-100">
+              {/* <div className="p-6 border-b border-slate-100">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
                   <div className="w-1 h-8 bg-blue-600 rounded-full"></div>
                   Board Members
                 </h2>
-              </div>
+              </div> */}
 
               <div className="p-6">
                 {loadingMembers ? (

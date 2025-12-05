@@ -1,45 +1,52 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Users, Target, Heart, Award } from "lucide-react"
-
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Autoplay, Pagination } from "swiper/modules"
+import "swiper/css"
+import "swiper/css/pagination"
 
 const AboutUs = () => {
     const [aboutUs, setAboutUs] = useState<string>("")
+    const [gallery, setGallery] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    const router = useRouter()
-
     useEffect(() => {
-        const fetchAboutUs = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true)
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL
-                const response = await fetch(`${apiUrl}settings`)
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch about us data")
-                }
+                const [aboutRes, galleryRes] = await Promise.all([
+                    fetch(`${apiUrl}settings`),
+                    fetch(`${apiUrl}gallery`)
+                ])
 
-                const data = await response.json()
+                const aboutData = await aboutRes.json()
+                const galleryData = await galleryRes.json()
+
                 setAboutUs(
-                    data.about ||
-                    "We are passionate about creating exceptional experiences and building meaningful connections with our community.",
+                    aboutData.about ||
+                    "We are passionate about creating exceptional experiences and building meaningful connections with our community."
                 )
+
+                // ✅ FILTER ONLY ABOUT IMAGES
+                const aboutImages = galleryData.filter(
+                    (item: any) => item.category === "about"
+                )
+
+                setGallery(aboutImages)
             } catch (err) {
-                setError(err instanceof Error ? err.message : "Something went wrong")
-                // Fallback content
+                setError("Failed to load data")
                 setAboutUs(
-                    "We are passionate about creating exceptional experiences and building meaningful connections with our community. Our team is dedicated to innovation, quality, and making a positive impact in everything we do.",
+                    "We are passionate about creating exceptional experiences and building meaningful connections with our community."
                 )
             } finally {
                 setLoading(false)
             }
         }
 
-        fetchAboutUs()
+        fetchData()
     }, [])
 
     if (loading) {
@@ -51,28 +58,55 @@ const AboutUs = () => {
     }
 
     return (
-        <div className="relative overflow-hidden bg-[#FFFADA] py-5 px-6 font-poppins">
-            {/* Background decoration */}
-            {/* <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10"></div>
-      <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl -z-10"></div>
-      <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-96 h-96 bg-gradient-to-tr from-emerald-400/20 to-blue-600/20 rounded-full blur-3xl -z-10"></div> */}
+        <section className="py-10 px-6 font-poppins">
+            <div className="max-w-6xl mx-auto">
 
-            <div className="max-w-3xl mx-auto">
-                {/* Header Section */}
-                <div className="text-center mb-16">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl mb-6 shadow-lg">
-                        <Users className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
+                {/* HEADER */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
                         About Us
                     </h1>
                     <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-indigo-600 mx-auto rounded-full"></div>
                 </div>
 
-                {/* Main Content */}
-                <div className="gap-12 items-center mb-16">
+                {/* CONTENT */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+
+                    {/* LEFT SLIDER */}
+                    <div>
+                        {gallery.length > 0 ? (
+                            <Swiper
+                                modules={[Autoplay, Pagination]}
+                                autoplay={{ delay: 3000 }}
+                                pagination={{ clickable: true }}
+                                loop={true}
+                                className="rounded-xl shadow-xl"
+                            >
+                                {gallery.flatMap((item) =>
+                                    item.images.map((img: string, index: number) => (
+                                        <SwiperSlide key={`${item.id}-${index}`}>
+                                            <img
+                                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
+                                                alt={item.title}
+                                                className="w-full h-[350px] object-cover rounded-xl"
+                                            />
+                                        </SwiperSlide>
+                                    ))
+                                )}
+                            </Swiper>
+                        ) : (
+                            <div className="h-[350px] flex items-center justify-center bg-gray-200 rounded-xl">
+                                <p className="text-gray-600 text-sm">No about images found</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* RIGHT TEXT */}
                     <div className="space-y-6">
-                        <p className="text-lg leading-relaxed text-slate-700 font-medium">{aboutUs}</p>
+                        <p className="text-lg leading-relaxed text-slate-700 font-medium text-justify">
+                            {aboutUs}
+                        </p>
+
                         {error && (
                             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                                 <p className="text-amber-800 text-sm">
@@ -82,10 +116,9 @@ const AboutUs = () => {
                         )}
                     </div>
 
-                    
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 

@@ -15,6 +15,7 @@ interface Report {
 
 export default function MembersPage() {
   const [reports, setReports] = useState<Report[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchReports = async () => {
     try {
@@ -30,12 +31,23 @@ export default function MembersPage() {
       setReports(filteredReports);
     } catch (error) {
       console.error("Failed to fetch reports:", error);
+    }finally{
+      setLoading(false)
     }
   };
 
   useEffect(() => {
     fetchReports();
   }, []);
+
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   // Format reports for table
   const formattedData = reports.map((report) => ({

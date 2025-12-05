@@ -70,20 +70,20 @@ setMembers(boardMembers)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className=" font-poppins min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md mb-6">
+          {/* <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md mb-6">
             <Users className="w-6 h-6 text-blue-600" />
             <span className="text-blue-600 font-semibold">Board Members</span>
-          </div>
+          </div> */}
 
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">कार्य समिति</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">कार्य समिति</h1>
 
           <div className="flex items-center justify-center gap-2 text-gray-600">
             <Calendar className="w-5 h-5" />
-            <p className="text-lg font-medium">Board Members (2080 – 2084)</p>
+            <p className="text-lg font-medium">Board Members</p>
           </div>
 
           {/* Decorative line */}
@@ -99,7 +99,7 @@ setMembers(boardMembers)
             <p className="text-gray-600 text-lg font-medium">No board members found.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 md:gap-3 gap-8">
             {members.map((member) => (
               <MemberCard key={member.id} {...member} photo={member.photo ?? ""} />
             ))}

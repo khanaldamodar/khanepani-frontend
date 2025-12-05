@@ -5,6 +5,7 @@ import axios from "axios";
 
 export default function BlogListPage() {
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -14,6 +15,8 @@ export default function BlogListPage() {
         setBlogs(response.data);
       } catch (error) {
         console.error("Error fetching blogs:", error);
+      }finally{
+        setLoading(false);
       }
     };
     fetchBlogs();
@@ -23,6 +26,15 @@ export default function BlogListPage() {
     const baseUrl = process.env.NEXT_PUBLIC_IMAGE_URL;
     return imgPath ? `${baseUrl}${imgPath}` : "/default-image.jpg"; // fallback image
   };
+
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">

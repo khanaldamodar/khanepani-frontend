@@ -122,6 +122,7 @@ export default function AddGallery() {
           <option value="activity">Activity</option>
           <option value="banner">Banner</option>
           <option value="others">Others</option>
+          <option value="about">About Section</option>
         </select>
 
         {id && existingImages.length > 0 && (

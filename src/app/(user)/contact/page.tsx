@@ -47,6 +47,14 @@ export default function ContactPage() {
     }, 1000); // Fake delay for demo
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-12 font-poppins">
       <h2 className="text-3xl font-bold mb-6 text-center">Contact Us</h2>

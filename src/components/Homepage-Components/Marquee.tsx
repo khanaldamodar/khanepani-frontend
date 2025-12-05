@@ -9,7 +9,7 @@ interface DocumentItem {
 }
 export default function MarqueeBanner() {
   const [notices, setNotices] = useState<DocumentItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
@@ -19,10 +19,10 @@ export default function MarqueeBanner() {
         const res = await fetch(`${apiUrl}posts`);
         const data: DocumentItem[] = await res.json();
         setNotices(data);
-        
+
       } catch (error) {
         console.error("Failed to fetch notices:", error);
-      }finally{
+      } finally {
         setIsLoading(false);
       }
     };
@@ -32,15 +32,20 @@ export default function MarqueeBanner() {
 
 
 
+  if (isLoading) {
+    return (
+      <div className="bg-white flex items-center gap-4 py-2 px-4 border-b border-gray-200 font-poppins">
+        <span className="font-semibold text-blue-700 whitespace-nowrap">📢 Notices:</span>
+        <div className="flex-1 animate-pulse bg-gray-200 rounded h-4"></div>
+      </div>
+    );
+  }
+
   if (notices.length === 0) {
+    return null; // SHOW NOTHING IF NO DATA
+  }
+
   return (
-    <div className="bg-white flex items-center gap-4 py-2 px-4 border-b border-gray-200 font-poppins">
-      <span className="font-semibold text-blue-700 whitespace-nowrap">📢 Notices:</span>
-      <span className="text-sm text-gray-500">Loading...</span>
-    </div>
-  );
-}
-return (
     <div className="bg-white flex items-center gap-4 py-2 px-4 border-b border-gray-200 font-poppins">
       <span className="font-semibold text-blue-700 whitespace-nowrap">
         📢 Notices:
@@ -70,5 +75,5 @@ return (
       )}
     </div>
   );
-  
+
 }

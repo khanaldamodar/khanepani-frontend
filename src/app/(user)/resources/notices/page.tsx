@@ -17,6 +17,7 @@ interface Notices {
 
 export default function MembersPage() {
   const [notices, setNotices] = useState<Notices[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchNotices = async () => {
     try {
@@ -34,12 +35,23 @@ export default function MembersPage() {
       setNotices(filteredNotices);
     } catch (error) {
       console.error("Failed to fetch Notices:", error);
+    } finally {
+      setLoading(false)
     }
   };
 
   useEffect(() => {
     fetchNotices();
   }, []);
+
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-12 h-12 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   // Format Notices for table
   const formattedData = notices.map((notice) => ({
