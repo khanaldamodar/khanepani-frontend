@@ -73,7 +73,7 @@ setMembers(boardMembers)
     <div className=" font-poppins min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-6">
           {/* <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md mb-6">
             <Users className="w-6 h-6 text-blue-600" />
             <span className="text-blue-600 font-semibold">Board Members</span>
