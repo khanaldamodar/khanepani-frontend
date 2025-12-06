@@ -88,7 +88,7 @@ export default function AddGallery() {
       }
     } catch (err) {
       // alert("Error saving gallery");
-      toast.error("Error saving gallery")
+      // toast.error("Error saving gallery")
     } finally {
       setLoading(false);
     }
@@ -142,6 +142,7 @@ export default function AddGallery() {
           type="file"
           accept="image/*"
           multiple
+          required
           onChange={handleImageChange}
           className="w-full border px-4 py-2 rounded"
         />

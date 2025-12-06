@@ -156,7 +156,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
 
           {/* Dropdown */}
           {openMenu === "about" && (
-            <div className="absolute left-0 top-8 w-48 bg-blue-600 shadow-lg rounded-md z-20 border">
+            <div className="absolute left-0 top-full mt-2 w-48 bg-blue-600 shadow-lg rounded-md z-50 border">
               <Link
                 href="/members/board-members"
                 className="block px-4 py-3 text-white  hover:text-blue-200"
@@ -188,7 +188,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
           </button>
 
           {openMenu === "resources" && (
-            <div className="absolute left-0 top-10 w-48 bg-blue-600 shadow-lg rounded-md border z-20">
+            <div className="absolute left-0 top-full mt-2 w-48 bg-blue-600 shadow-lg rounded-md border z-50">
               <Link
                 href="/resources/reports"
                 className="block px-4 py-3  text-white hover:text-blue-200"
@@ -338,7 +338,7 @@ export default function Navbar({ data }: { data: NavbarData }) {
       {/* Mobile Background Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-20 md:hidden"
+          className="fixed inset-0 bg-black/20 z-10 md:hidden"
           onClick={closeMobileMenu}
         />
       )}
