@@ -13,9 +13,9 @@ export default function Home() {
     <MarqueeBanner/>
     <GalleryWithMembers/>
     <AboutUs/>
-    <BoardMembers/>
-    <Awards/>
-    <Compositions/>
+    {/* <BoardMembers/> */}
+    {/* <Awards/> */}
+    {/* <Compositions/> */}
     </>
   );
 }

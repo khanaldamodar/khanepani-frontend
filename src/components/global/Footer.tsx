@@ -108,7 +108,7 @@ export default function Footer() {
       </div>
 
       <div className="text-center py-4 bg-blue-950 text-sm text-white/70">
-        © {new Date().getFullYear()} Gagangauda Khanepani. All rights reserved. Developed by <Link className="text-green-600" href={'https://www.shaktatechnology.com/'}>Shakta Technology</Link>.
+        © {new Date().getFullYear()} Gagangauda Khanepani. All rights reserved. Developed by <Link className="text-green-600" href={'#'}>WashTech</Link>.
       </div>
     </footer>
   );
