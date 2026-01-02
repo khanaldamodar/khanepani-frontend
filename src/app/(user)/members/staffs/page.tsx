@@ -1,8 +1,7 @@
-// app/members/page.tsx
+// app/members/staffs/page.tsx
 "use client";
-
-import NoDataFound from "@/components/global/DataNotFound";
 import MemberCard from "@/components/global/IndividualMember";
+import NoDataFound from "@/components/global/DataNotFound";
 import React, { useState, useEffect } from "react";
 
 interface Member {
@@ -11,41 +10,57 @@ interface Member {
   number: string;
   photo: string;
   type: string;
+  joining_date?: string;
+  leaving_date?: string;
   created_at?: string;
   updated_at?: string;
 }
 
-export default function MembersPage() {
-
-  const [staffs, setStaffs] = useState<Member[]>([]);
-
-    const [loading, setLoading] = useState(true);
+export default function StaffsPage() {
+  const [presentStaff, setPresentStaff] = useState<Member[]>([]);
+  const [previousStaff, setPreviousStaff] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"present" | "previous">("present");
 
   useEffect(() => {
-    // Fetch staff data from an API or database
     const fetchStaffs = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}members`
-        );
-
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}members`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data: Member[] = await response.json();
-        const filteredData = data.filter((item) => item.type === "staff");
-        console.log("Filtered Staffs:", filteredData);
-        setStaffs(filteredData);
+
+        // Filter for staff members
+        const staffs = data.filter((item) => item.type === "staff");
+
+        // Split into present and previous
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const present = staffs.filter(m => {
+          const lDateStr = m.leaving_date?.trim();
+          const lDate = lDateStr ? new Date(lDateStr) : null;
+          return !lDate || lDate > today;
+        });
+
+        const previous = staffs.filter(m => {
+          const lDateStr = m.leaving_date?.trim();
+          const lDate = lDateStr ? new Date(lDateStr) : null;
+          return lDate && lDate <= today;
+        });
+
+        setPresentStaff(present);
+        setPreviousStaff(previous);
       } catch (error) {
         console.error("Failed to fetch staffs:", error);
-      }finally{
-        setLoading(false); 
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStaffs();
   }, []);
-
 
   if (loading) {
     return (
@@ -55,23 +70,45 @@ export default function MembersPage() {
     );
   }
 
+  const currentList = activeTab === "present" ? presentStaff : previousStaff;
 
-
-  if (staffs.length === 0) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 md:py-40 font-poppins">
-        <NoDataFound />
-      </div>
-    );
-  }
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 font-poppins">
-      <h2 className="text-3xl font-bold mb-6 text-center">Our Members</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {staffs.map((member, index) => (
-          <MemberCard key={index} {...member} />
-        ))}
+      <h2 className="text-3xl font-bold mb-8 text-center">Our Staff</h2>
+
+      {/* Tabs */}
+      <div className="flex justify-center mb-8 border-b">
+        <button
+          onClick={() => setActiveTab("present")}
+          className={`px-6 py-2 font-semibold transition-colors duration-300 ${activeTab === "present"
+            ? "border-b-4 border-blue-600 text-blue-600"
+            : "text-gray-500 hover:text-blue-500"
+            }`}
+        >
+          Present Staff
+        </button>
+        <button
+          onClick={() => setActiveTab("previous")}
+          className={`px-6 py-2 font-semibold transition-colors duration-300 ${activeTab === "previous"
+            ? "border-b-4 border-blue-600 text-blue-600"
+            : "text-gray-500 hover:text-blue-500"
+            }`}
+        >
+          Previous Staff
+        </button>
       </div>
+
+      {currentList.length === 0 ? (
+        <div className="py-20">
+          <NoDataFound />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {currentList.map((member, index) => (
+            <MemberCard key={index} {...member} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

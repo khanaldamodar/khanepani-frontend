@@ -15,14 +15,14 @@ export default function AddMember() {
     number: "",
     position: "",
     type: "board",
-    photo: null as File | null, // for new file
+    photo: null as File | null,
+    joining_date: "",
+    leaving_date: "",
   });
 
-  const [preview, setPreview] = useState<string | null>(null); // 🔹 preview for both edit & upload
+  const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  // Fetch data if editing
   useEffect(() => {
     if (editId) {
       const fetchMember = async () => {
@@ -40,12 +40,12 @@ export default function AddMember() {
             position: data.position,
             type: data.type,
             photo: null,
+            joining_date: data.joining_date,
+            leaving_date: data.leaving_date,
           });
 
-          // 🔹 Set preview with existing image
           setPreview(process.env.NEXT_PUBLIC_IMAGE_URL + data.photo);
-        } catch (error) {
-          // alert("Failed to load member details.");
+        } catch {
           toast.error("Failed to load member details.");
         }
       };
@@ -65,11 +65,8 @@ export default function AddMember() {
       const file = e.target.files[0];
       setForm((prev) => ({ ...prev, photo: file }));
 
-      // 🔹 Create local preview for uploaded image
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
+      reader.onloadend = () => setPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -77,140 +74,144 @@ export default function AddMember() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
 
     const formData = new FormData();
-    formData.append("name", form.name);
-    formData.append("number", form.number);
-    formData.append("position", form.position);
-    formData.append("type", form.type);
-    if (form.photo) formData.append("photo", form.photo);
+    Object.entries(form).forEach(([key, value]) => {
+      if (value) formData.append(key, value as any);
+    });
     if (editId) formData.append("_method", "PUT");
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       const token = Cookies.get("token");
+
       const res = await fetch(
         editId ? `${apiUrl}members/${editId}` : `${apiUrl}members`,
         {
-          method: "POST", // Laravel expects POST (with _method override)
+          method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         }
       );
 
       if (res.ok) {
-        setSuccess(true);
-        toast.success("Member added Successfully")
-        if (!editId) {
-          setForm({
-            name: "",
-            number: "",
-            position: "",
-            type: "board",
-            photo: null,
-          });
-          setPreview(null);
-          (document.getElementById("photo") as HTMLInputElement).value = "";
-        } else {
-          router.push("/admin/members"); // Redirect after update
-        }
+        toast.success(editId ? "Member updated" : "Member added");
+        editId ? router.push("/admin/members") : location.reload();
       } else {
-        const error = await res.json();
-        // alert(error.message || "Something went wrong.");
-        toast.error(error.message || "Something went wrong.");
+        const err = await res.json();
+        toast.error(err.message || "Something went wrong");
       }
-    } catch (error) {
-      // alert("Failed to save member.");
-      toast.error("Failed to save member.");
+    } catch {
+      toast.error("Failed to save member");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white shadow-md rounded-xl p-6 font-poppins">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {editId ? "Edit Member" : "Add Member"}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          className="w-full border px-4 py-2 rounded"
-        />
+    <div className="max-w-2xl mx-auto mt-10 bg-white rounded-2xl shadow-lg border font-poppins">
+      {/* Header */}
+      <div className="px-6 py-4 border-b">
+        <h2 className="text-xl font-semibold text-gray-800 text-center">
+          {editId ? "Edit Member" : "Add New Member"}
+        </h2>
+        <p className="text-sm text-gray-500 text-center">
+          Fill the details below
+        </p>
+      </div>
 
-        {/* 🔹 Preview + File Upload */}
+      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Image Preview */}
         {preview && (
-          <div className="mb-2 flex justify-center">
+          <div className="flex justify-center">
             <img
               src={preview}
+              className="w-28 h-28 rounded-full object-cover border shadow"
               alt="Preview"
-              className="w-24 h-24 object-cover rounded-full border"
             />
           </div>
         )}
-        <input
-          type="file"
-          id="photo"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="w-full border px-4 py-2 rounded"
-        />
 
-        <input
-          type="text"
-          name="number"
-          placeholder="Phone Number"
-          value={form.number}
-          onChange={handleChange}
-          className="w-full border px-4 py-2 rounded"
-        />
+        {/* Upload */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Photo</label>
+          <input
+            type="file"
+            id="photo"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="w-full text-sm border rounded-lg file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:bg-blue-50 file:text-blue-600
+              hover:file:bg-blue-100"
+          />
+        </div>
 
-        <input
-          type="text"
-          name="position"
-          placeholder="Position"
-          value={form.position}
-          onChange={handleChange}
-          required
-          className="w-full border px-4 py-2 rounded"
-        />
+        {/* Inputs Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input label="Full Name" placeholder="Enter full name" name="name" value={form.name} onChange={handleChange} />
+          <Input label="Phone Number" placeholder="Enter phone number" name="number" value={form.number} onChange={handleChange} />
+          <Input label="Position" placeholder="Enter position" name="position" value={form.position} onChange={handleChange} />
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Type</label>
+            <select
+            required
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="input border w-full px-4 py-2 rounded-lg"
+            >
+              <option value="board">Board</option>
+              <option value="staff">Staff</option>
+              <option value="advisor">Advisor</option>
+              <option value="lekha">Lekha Samittee</option>
+              <option value="plan_committee">Water Safety Plan Committee</option>
+            </select>
+          </div>
 
-        <select
-          name="type"
-          value={form.type}
-          onChange={handleChange}
-          className="w-full border px-4 py-2 rounded"
-        >
-          <option value="board">Board</option>
-          <option value="staff">Staff</option>
-        </select>
+          <Input
+            type="date"
+            label="Joining Date"
+            name="joining_date"
+            value={form.joining_date}
+            onChange={handleChange}
+          />
 
+          <Input
+            type="date"
+            label="Leaving Date"
+            name="leaving_date"
+            value={form.leaving_date}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className="w-full py-2.5 rounded-xl text-white font-medium
+            bg-gradient-to-r from-blue-600 to-indigo-600
+            hover:opacity-90 transition disabled:opacity-60"
         >
-          {loading
-            ? editId
-              ? "Updating..."
-              : "Adding..."
-            : editId
-            ? "Update Member"
-            : "Add Member"}
+          {loading ? "Saving..." : editId ? "Update Member" : "Add Member"}
         </button>
-
-        {success && (
-          <p className="text-green-600 text-center mt-2">
-            Saved successfully!
-          </p>
-        )}
       </form>
+    </div>
+  );
+}
+
+/* Reusable Input */
+function Input({ label, ...props }: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      <input
+        {...props}
+        className="w-full border rounded-lg px-4 py-2
+        focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
     </div>
   );
 }

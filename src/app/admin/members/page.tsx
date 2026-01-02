@@ -13,6 +13,8 @@ interface Member {
   position: string;
   type: "board" | "staff";
   photo: string; // URL to the image
+  joining_date: string;
+  leaving_date: string;
 }
 
 export default function MembersList() {
@@ -90,7 +92,7 @@ export default function MembersList() {
 
         <div className="flex flex-col sm:flex-row gap-3">
           {/* 🔹 Search by name */}
-            <input
+          <input
             type="text"
             placeholder="Search by name..."
             value={search}
@@ -120,6 +122,8 @@ export default function MembersList() {
               <th className="px-4 py-3 text-left">Number</th>
               <th className="px-4 py-3 text-left">Position</th>
               <th className="px-4 py-3 text-left">Type</th>
+              <th className="px-4 py-3 text-left">Joining Date</th>
+              <th className="px-4 py-3 text-left">Leaving Date</th>
               <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -137,10 +141,12 @@ export default function MembersList() {
                 <td className="px-4 py-3">{member.number}</td>
                 <td className="px-4 py-3">{member.position}</td>
                 <td className="px-4 py-3 capitalize">{member.type}</td>
+                <td className="px-4 py-3">{member.joining_date?.split(" ")[0] || "-"}</td>
+                <td className="px-4 py-3">
+                  {member.leaving_date?.split(" ")[0] || "-"}
+                </td>
                 <td className="px-4 py-3 flex items-center gap-3">
-                  {/* <button title="View">
-                    <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800" />
-                  </button> */}
+
                   <button title="Edit" onClick={() => handleEdit(member.id)}>
                     <Pencil className="h-5 w-5 text-yellow-600 hover:text-yellow-800" />
                   </button>
@@ -155,7 +161,7 @@ export default function MembersList() {
             ))}
             {filteredMembers.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-6 text-gray-500">
+                <td colSpan={8} className="text-center py-6 text-gray-500">
                   No members found.
                 </td>
               </tr>
