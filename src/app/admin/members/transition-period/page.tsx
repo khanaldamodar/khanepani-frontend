@@ -129,7 +129,8 @@ function YearPicker({ value, onChange, label, required = false }: YearPickerProp
    CONFIG
 ======================= */
 
-const API_URL = "http://localhost:8000/api/transition-periods";
+
+ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 /* =======================
    PAGE
@@ -155,7 +156,7 @@ export default function TransitionPeriodsPage() {
     }, []);
 
     const fetchTransitionPeriods = async (): Promise<void> => {
-        const res = await fetch(API_URL);
+        const res = await fetch(`${apiUrl}transition-periods`);
         const data: TransitionPeriod[] = await res.json();
         setTransitionPeriods(data);
     };
@@ -201,8 +202,8 @@ export default function TransitionPeriodsPage() {
         }
 
         const url: string = isEditing
-            ? `${API_URL}/${form.id}`
-            : API_URL;
+            ? `${apiUrl}transition-periods/${form.id}`
+            : `${apiUrl}transition-periods`;
 
         const method: "POST" | "PUT" = isEditing ? "PUT" : "POST";
 
@@ -264,7 +265,7 @@ export default function TransitionPeriodsPage() {
     const handleDelete = async (id: number): Promise<void> => {
         if (!confirm("Delete this transition period?")) return;
 
-        await fetch(`${API_URL}/${id}`, {
+        await fetch(`${apiUrl}transition-periods/${id}`, {
             method: "DELETE"
 
         });
