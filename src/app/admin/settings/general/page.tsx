@@ -16,13 +16,15 @@ export default function GeneralSettingsPage() {
     mission: "",
     values: "",
     commitment: "",
+    map_location: "",
+    google_earth_link: ""
   });
 
   const [logo, setLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [pdf, setPdf] = useState<File | null>(null); // ✅ new state
+  const [pdf, setPdf] = useState<File | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
 
   // 🔁 Fetch existing settings on page load
@@ -98,6 +100,8 @@ export default function GeneralSettingsPage() {
     formData.append("mission", form.mission || "");
     formData.append("values", form.values || "");
     formData.append("commitment", form.commitment || "");
+    formData.append("map_location", form.map_location || "");
+    formData.append("google_earth_link", form.google_earth_link || "");
 
     if (logo) formData.append("logo", logo);
     if (pdf) formData.append("form", pdf);
@@ -386,6 +390,37 @@ export default function GeneralSettingsPage() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-10">
+              <label className=" text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <MapPin className="mr-2" size={18} />
+                Google Earth Link
+              </label>
+              <input
+                type="url"
+                name="google_earth_link"
+                value={form.google_earth_link || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors bg-white shadow-sm"
+                placeholder="https://earth.google.com/web/@28.1305,84.0851..."
+              />
+            </div>
+
+            <div className="mt-10">
+              <label className=" text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <MapPin className="mr-2" size={18} />
+                Office Map Location (Embed URL)
+              </label>
+              <input
+                type="text"
+                name="map_location"
+                value={form.map_location || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors bg-white shadow-sm"
+                placeholder="Enter standard Google Maps embed URL"
+              />
+            </div>
+
 
             {/* Submit Section */}
             <div className="mt-10 pt-6 border-t border-gray-200">

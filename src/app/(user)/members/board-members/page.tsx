@@ -1,20 +1,31 @@
 // app/members/board-members/page.tsx
 "use client";
 import MemberCard from "@/components/global/IndividualMember";
-import Loader from "@/components/global/Loader";
 import NoDataFound from "@/components/global/DataNotFound";
 import React, { useState, useEffect } from "react";
 
-interface Member {
+interface TransitionPeriod {
+  id: number;
   name: string;
-  position: string;
+  start_date: number;
+  end_date: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Member {
+  id: number;
+  transition_period_id: number;
+  name: string;
+  photo: string | null;
   number: string;
-  photo: string;
+  position: string;
   type: string;
-  joining_date?: string;
-  leaving_date?: string;
-  created_at?: string;
-  updated_at?: string;
+  joining_date: string | null;
+  leaving_date: string | null;
+  created_at: string;
+  updated_at: string;
+  transition_period: TransitionPeriod;
 }
 
 const POSITION_ORDER = [
@@ -27,7 +38,7 @@ const POSITION_ORDER = [
 ];
 
 export default function BoardMembersPage() {
-  const [data, setData] = useState<Member[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"present" | "previous">("present");
 
@@ -38,8 +49,8 @@ export default function BoardMembersPage() {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        const jsonData: Member[] = await response.json();
-        setData(jsonData);
+        const data: Member[] = await response.json();
+        setMembers(data);
       } catch (error) {
         console.error("Failed to fetch board members:", error);
       } finally {
@@ -59,49 +70,147 @@ export default function BoardMembersPage() {
   }
 
   // Filter out staff
-  const nonStaffMembers = data.filter((m) => m.type !== "staff");
+  const nonStaffMembers = members.filter((m) => m.type !== "staff");
 
-  // Split into Present and Previous based on activeTab
-  const currentTabMembers = nonStaffMembers.filter((m) => {
-    const today = new Date();
-    // Reset time for date-only comparison
-    today.setHours(0, 0, 0, 0);
-
-    const lDateStr = m.leaving_date?.trim();
-    const lDate = lDateStr ? new Date(lDateStr) : null;
-
-    // Present if: No leaving date OR leaving date is in the future
-    const isPresent = !lDate || lDate > today;
-
-    return activeTab === "present" ? isPresent : !isPresent;
+  // Group members by transition period
+  const groupedByPeriod: { [key: number]: { period: TransitionPeriod; members: Member[] } } = {};
+  nonStaffMembers.forEach((member) => {
+    const periodId = member.transition_period_id;
+    if (!groupedByPeriod[periodId]) {
+      groupedByPeriod[periodId] = {
+        period: member.transition_period,
+        members: [],
+      };
+    }
+    groupedByPeriod[periodId].members.push(member);
   });
 
-  // Categorize
-  const boardMembers = currentTabMembers.filter((m) => m.type === "board");
-  const advisors = currentTabMembers.filter((m) => m.type === "advisor");
-  const lekhaSamittee = currentTabMembers.filter((m) => m.type === "lekha");
-  const planCommittee = currentTabMembers.filter((m) => m.type === "plan_committee");
+  // Sort periods by start_date descending
+  const sortedPeriodIds = Object.keys(groupedByPeriod)
+    .map(Number)
+    .sort((a, b) => groupedByPeriod[b].period.start_date - groupedByPeriod[a].period.start_date);
 
-  // Sort Board Members by position priority
+  const latestPeriodId = sortedPeriodIds[0];
+  const previousPeriodIds = sortedPeriodIds.slice(1);
+
   const getPriority = (pos: string) => {
     const index = POSITION_ORDER.indexOf(pos.trim());
     return index === -1 ? 999 : index;
   };
 
-  const sortedBoard = [...boardMembers].sort(
-    (a, b) => getPriority(a.position) - getPriority(b.position)
-  );
+  const renderMemberSection = (periodMembers: Member[]) => {
+    const boardMembers = periodMembers.filter((m) => m.type === "board");
+    const advisors = periodMembers.filter((m) => m.type === "advisor");
+    const lekhaSamittee = periodMembers.filter((m) => m.type === "lekha");
+    const planCommittee = periodMembers.filter((m) => m.type === "plan_committee");
 
-  // Split board into rows for the layout
-  const firstRow = sortedBoard.slice(0, 1);
-  const secondRow = sortedBoard.slice(1, 4);
-  const thirdRow = sortedBoard.slice(4, 6);
-  const otherBoard = sortedBoard.slice(6);
+    const sortedBoard = [...boardMembers].sort(
+      (a, b) => getPriority(a.position) - getPriority(b.position)
+    );
 
-  const hasData = currentTabMembers.length > 0;
+    const firstRow = sortedBoard.slice(0, 1);
+    const secondRow = sortedBoard.slice(1, 4);
+    const thirdRow = sortedBoard.slice(4, 6);
+    const otherBoard = sortedBoard.slice(6);
+
+    return (
+      <div className="space-y-20">
+        {/* SECTION: BOARD MEMBERS */}
+        {sortedBoard.length > 0 && (
+          <div className="space-y-12">
+            <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
+              Board Members
+            </h3>
+
+            <div className="space-y-4">
+              {firstRow.length > 0 && (
+                <div className="flex justify-center">
+                  <div className="w-full max-w-sm">
+                    <MemberCard photo={firstRow[0].photo || ""} name={firstRow[0].name} number={firstRow[0].number} position={firstRow[0].position} />
+                  </div>
+                </div>
+              )}
+
+              {secondRow.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center items-center">
+                  {secondRow.map((member, index) => (
+                    <div key={index} className="flex justify-center">
+                      <div className="w-full max-w-sm">
+                        <MemberCard photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {thirdRow.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-8">
+                  {thirdRow.map((member, index) => (
+                    <div key={index} className="w-full max-w-sm sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-2rem)] lg:w-[calc(25%-2rem)] min-w-[300px]">
+                      <MemberCard photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {otherBoard.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t">
+                  {otherBoard.map((member, index) => (
+                    <MemberCard key={index} photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: ADVISORS */}
+        {advisors.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
+              Advisors
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {advisors.map((member, index) => (
+                <MemberCard key={index} photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: LEKHA SAMITTEE */}
+        {lekhaSamittee.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
+              Lekha Samittee
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {lekhaSamittee.map((member, index) => (
+                <MemberCard key={index} photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: PLAN COMMITTEE */}
+        {planCommittee.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
+              Water Safety Plan Committee
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {planCommittee.map((member, index) => (
+                <MemberCard key={index} photo={member.photo || ""} name={member.name} number={member.number} position={member.position} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 font-poppins">
+    <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-slate-800">
       <h2 className="text-3xl font-bold mb-8 text-center">Board Members & Committees</h2>
 
       {/* Tabs */}
@@ -126,108 +235,36 @@ export default function BoardMembersPage() {
         </button>
       </div>
 
-      {!hasData ? (
-        <div className="py-20">
+      {activeTab === "present" ? (
+        latestPeriodId ? (
+          <div>
+            <div className="text-center mb-10">
+              <span className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-semibold text-lg">
+                Transition Period: {groupedByPeriod[latestPeriodId].period.start_date} - {groupedByPeriod[latestPeriodId].period.end_date}
+              </span>
+            </div>
+            {renderMemberSection(groupedByPeriod[latestPeriodId].members)}
+          </div>
+        ) : (
           <NoDataFound />
-        </div>
+        )
       ) : (
-        <div className="space-y-20">
-
-          {/* SECTION: BOARD MEMBERS */}
-          {sortedBoard.length > 0 && (
-            <div className="space-y-12">
-              <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
-                Board Members
-              </h3>
-
-              <div className="space-y-4">
-                {/* Row 1: Top (1 member) */}
-                {firstRow.length > 0 && (
-                  <div className="flex justify-center">
-                    <div className="w-full max-w-sm">
-                      <MemberCard {...firstRow[0]} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Row 2: (3 members) */}
-                {secondRow.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center items-center">
-                    {secondRow.map((member, index) => (
-                      <div key={index} className="flex justify-center">
-                        <div className="w-full max-w-sm">
-                          <MemberCard {...member} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Row 3: (2 members) */}
-                {thirdRow.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-8">
-                    {thirdRow.map((member, index) => (
-                      <div key={index} className="w-full max-w-sm sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-2rem)] lg:w-[calc(25%-2rem)] min-w-[300px]">
-                        <MemberCard {...member} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Others Board: Normal Grid */}
-                {otherBoard.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t">
-                    {otherBoard.map((member, index) => (
-                      <MemberCard key={index} {...member} />
-                    ))}
-                  </div>
-                )}
+        <div className="space-y-24">
+          {previousPeriodIds.length > 0 ? (
+            previousPeriodIds.map((id) => (
+              <div key={id} className="border-t pt-10">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl font-bold text-gray-800 mb-2">
+                    Transition Period: {groupedByPeriod[id].period.start_date} - {groupedByPeriod[id].period.end_date}
+                  </h3>
+                  <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+                </div>
+                {renderMemberSection(groupedByPeriod[id].members)}
               </div>
-            </div>
+            ))
+          ) : (
+            <NoDataFound />
           )}
-
-          {/* SECTION: ADVISORS */}
-          {advisors.length > 0 && (
-            <div className="space-y-8">
-              <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
-                Advisors
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {advisors.map((member, index) => (
-                  <MemberCard key={index} {...member} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION: LEKHA SAMITTEE */}
-          {lekhaSamittee.length > 0 && (
-            <div className="space-y-8">
-              <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
-                Lekha Samittee
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {lekhaSamittee.map((member, index) => (
-                  <MemberCard key={index} {...member} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* SECTION: PLAN COMMITTEE */}
-          {planCommittee.length > 0 && (
-            <div className="space-y-8">
-              <h3 className="text-2xl font-bold text-center text-blue-800 underline underline-offset-8">
-                Water Safety Plan Committee
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {planCommittee.map((member, index) => (
-                  <MemberCard key={index} {...member} />
-                ))}
-              </div>
-            </div>
-          )}
-
         </div>
       )}
     </div>

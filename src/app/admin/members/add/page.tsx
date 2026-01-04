@@ -16,14 +16,29 @@ export default function AddMember() {
     position: "",
     type: "board",
     photo: null as File | null,
-    joining_date: "",
-    leaving_date: "",
+    transition_period_id: null as number | null,
   });
-
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [transitionPeriods, setTransitionPeriods] = useState<{ id: number, name: string, start_date: number, end_date: number | null }[]>([]);
 
   useEffect(() => {
+    const fetchTransitionPeriods = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const token = Cookies.get("token");
+        const res = await fetch(`${apiUrl}transition-periods`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+        });
+        const data = await res.json();
+        setTransitionPeriods(data);
+      } catch (err) {
+        toast.error("Failed to load transition periods.");
+      }
+    };
+
+    fetchTransitionPeriods();
+
     if (editId) {
       const fetchMember = async () => {
         try {
@@ -40,8 +55,7 @@ export default function AddMember() {
             position: data.position,
             type: data.type,
             photo: null,
-            joining_date: data.joining_date,
-            leaving_date: data.leaving_date,
+            transition_period_id: data.transition_period_id || "",
           });
 
           setPreview(process.env.NEXT_PUBLIC_IMAGE_URL + data.photo);
@@ -77,8 +91,11 @@ export default function AddMember() {
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (value) formData.append(key, value as any);
-    });
+  if (value !== null && value !== "") {
+    formData.append(key, value as any);
+  }
+});
+
     if (editId) formData.append("_method", "PUT");
 
     try {
@@ -89,7 +106,7 @@ export default function AddMember() {
         editId ? `${apiUrl}members/${editId}` : `${apiUrl}members`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
           body: formData,
         }
       );
@@ -152,11 +169,11 @@ export default function AddMember() {
           <Input label="Full Name" placeholder="Enter full name" name="name" value={form.name} onChange={handleChange} />
           <Input label="Phone Number" placeholder="Enter phone number" name="number" value={form.number} onChange={handleChange} />
           <Input label="Position" placeholder="Enter position" name="position" value={form.position} onChange={handleChange} />
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">Type</label>
             <select
-            required
+              required
               name="type"
               value={form.type}
               onChange={handleChange}
@@ -170,22 +187,32 @@ export default function AddMember() {
             </select>
           </div>
 
-          <Input
-            type="date"
-            label="Joining Date"
-            name="joining_date"
-            value={form.joining_date}
-            onChange={handleChange}
-          />
 
-          <Input
-            type="date"
-            label="Leaving Date"
-            name="leaving_date"
-            value={form.leaving_date}
-            onChange={handleChange}
-          />
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Transition Period</label>
+          <select
+            name="transition_period_id"
+            value={form.transition_period_id ?? ""}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                transition_period_id: e.target.value ? Number(e.target.value) : null
+              }))
+            }
+            required
+            className="input border w-full px-4 py-2 rounded-lg"
+          >
+            <option value="">Select a period</option>
+            {transitionPeriods.map((period) => (
+              <option key={period.id} value={period.id}>
+                {period.name} ({period.start_date}-{period.end_date || "Present"})
+              </option>
+            ))}
+          </select>
+
+        </div>
+
 
         {/* Submit */}
         <button

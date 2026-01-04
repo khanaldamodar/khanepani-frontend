@@ -117,7 +117,8 @@ const AdminSidebar = () => {
       label: 'Members',
       submenu: [
         { icon: Plus, label: 'Add New', path: '/admin/members/add' },
-        { icon: List, label: 'All Members', path: '/admin/members' }
+        { icon: List, label: 'All Members', path: '/admin/members' },
+        { icon: List, label: 'Transition Period', path: '/admin/members/transition-period' }
       ]
     },
     {
