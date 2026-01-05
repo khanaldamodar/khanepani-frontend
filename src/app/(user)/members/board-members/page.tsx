@@ -37,10 +37,33 @@ const POSITION_ORDER = [
   "सहकोषाधक्ष्य",
 ];
 
+
+
+
 export default function BoardMembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"present" | "previous">("present");
+
+  const [previousMember, setPreviousMember] = useState<Member[]>([])
+
+
+
+  useEffect(() => {
+
+    const getPreviousChairPersonOnly = async () => {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}members`)
+
+      const data = await res.json()
+      console.log("Previous Member Data", data)
+
+    }
+
+    getPreviousChairPersonOnly()
+
+
+  }, [])
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -92,13 +115,22 @@ export default function BoardMembersPage() {
 
   const latestPeriodId = sortedPeriodIds[0];
   const previousPeriodIds = sortedPeriodIds.slice(1);
+  const immediatePreviousPeriodId = sortedPeriodIds[1];
+
+  // Find immediate previous chairperson (Chairman or अध्यक्ष)
+  let previousChairperson: Member | undefined;
+  if (immediatePreviousPeriodId && groupedByPeriod[immediatePreviousPeriodId]) {
+    previousChairperson = groupedByPeriod[immediatePreviousPeriodId].members.find(
+      (m) => m.position === "Chairman" || m.position === "अध्यक्ष"
+    );
+  }
 
   const getPriority = (pos: string) => {
     const index = POSITION_ORDER.indexOf(pos.trim());
     return index === -1 ? 999 : index;
   };
 
-  const renderMemberSection = (periodMembers: Member[]) => {
+  const renderMemberSection = (periodMembers: Member[], prevChairperson?: Member) => {
     const boardMembers = periodMembers.filter((m) => m.type === "board");
     const advisors = periodMembers.filter((m) => m.type === "advisor");
     const lekhaSamittee = periodMembers.filter((m) => m.type === "lekha");
@@ -124,10 +156,30 @@ export default function BoardMembersPage() {
 
             <div className="space-y-4">
               {firstRow.length > 0 && (
-                <div className="flex justify-center">
+                <div className="flex flex-col md:flex-row justify-center gap-8 items-center">
+                  {/* Current Chairperson */}
                   <div className="w-full max-w-sm">
                     <MemberCard photo={firstRow[0].photo || ""} name={firstRow[0].name} number={firstRow[0].number} position={firstRow[0].position} />
                   </div>
+
+                  {/* Immediate Previous Chairperson (Only shown if passed) */}
+                  {prevChairperson && (
+                    <div className="w-full max-w-sm">
+                      <div className="relative">
+                        <div className="absolute -top-3 left-0 right-0 text-center z-10">
+                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full border border-gray-200">
+                            Immediate Past Chairperson
+                          </span>
+                        </div>
+                        <MemberCard
+                          photo={prevChairperson.photo || ""}
+                          name={prevChairperson.name}
+                          number={prevChairperson.number || ""}
+                          position={prevChairperson.position}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -243,7 +295,7 @@ export default function BoardMembersPage() {
                 Transition Period: {groupedByPeriod[latestPeriodId].period.start_date} - {groupedByPeriod[latestPeriodId].period.end_date}
               </span>
             </div>
-            {renderMemberSection(groupedByPeriod[latestPeriodId].members)}
+            {renderMemberSection(groupedByPeriod[latestPeriodId].members, previousChairperson)}
           </div>
         ) : (
           <NoDataFound />

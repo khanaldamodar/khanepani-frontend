@@ -55,7 +55,9 @@ export default function AddMember() {
             position: data.position,
             type: data.type,
             photo: null,
-            transition_period_id: data.transition_period_id || "",
+            transition_period_id: data.transition_period_id
+              ? Number(data.transition_period_id)
+              : null,
           });
 
           setPreview(process.env.NEXT_PUBLIC_IMAGE_URL + data.photo);
@@ -91,10 +93,10 @@ export default function AddMember() {
 
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-  if (value !== null && value !== "") {
-    formData.append(key, value as any);
-  }
-});
+      if (value !== null && value !== "") {
+        formData.append(key, value as any);
+      }
+    });
 
     if (editId) formData.append("_method", "PUT");
 
