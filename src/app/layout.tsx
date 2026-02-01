@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: "गगनगौडा भू.पु. खानेपानी समिती",
   description: "गगनगौडा भू.पु. खानेपानी समिती",
   icons:{
-    icon: '/image.png'
+    icon: 'favicon.ico',
   }
 };
 

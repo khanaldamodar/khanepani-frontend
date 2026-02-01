@@ -114,7 +114,7 @@ export default function Footer() {
           <h3 className="text-lg font-bold mb-4">Important Links</h3>
           <ul className="space-y-2 text-sm">
             <li><Link href="/" className="hover:text-gray-300">Home</Link></li>
-            <li><Link href="/about/board-members" className="hover:text-gray-300">Board Members</Link></li>
+            <li><Link href="/members/board-members" className="hover:text-gray-300">Board Members</Link></li>
             <li><Link href="/gallery" className="hover:text-gray-300">Gallery</Link></li>
             <li><Link href="/blogs" className="hover:text-gray-300">Blogs</Link></li>
             <li><Link href="/contact" className="hover:text-gray-300">Contact Us</Link></li>
