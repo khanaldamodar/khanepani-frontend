@@ -7,11 +7,11 @@ import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "गगनगौडा भू.पु. खानेपानी समिती",
-  description: "गगनगौडा भू.पु. खानेपानी समिती",
-  icons:{
-    icon: '/image.png'
-  }
+  title: "Khanepani",
+  // description: "गगनगौडा भू.पु. खानेपानी समिती",
+  // icons:{
+  //   icon: '/image.png'
+  // }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

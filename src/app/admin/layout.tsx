@@ -7,11 +7,11 @@ import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "गगनगौडा भू.पु. खानेपानी समिती",
-  description: "गगनगौडा भू.पु. खानेपानी समिती",
-  icons:{
-    icon: '/image.png'
-  }
+  title: "Admin Panel",
+  // description: "गगनगौडा भू.पु. खानेपानी समिती",
+  // icons:{
+  //   icon: '/image.png'
+  // }
 };
 
 

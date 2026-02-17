@@ -20,11 +20,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "गगनगौडा भू.पु. खानेपानी समिती",
-  description: "गगनगौडा भू.पु. खानेपानी समिती",
-  icons:{
-    icon: 'favicon.ico',
-  }
+  title: "Khanepani",
+  // description: "गगनगौडा भू.पु. खानेपानी समिती",
+  // icons:{
+  //   icon: 'favicon.ico',
+  // }
 };
 
 export default function RootLayout({
