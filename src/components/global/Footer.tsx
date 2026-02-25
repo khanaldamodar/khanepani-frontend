@@ -18,6 +18,7 @@ interface CompanyDetails {
   phone: string;
   google_earth_link?: string;
   map_location?: string;
+  name: string;
 }
 
 
@@ -25,11 +26,13 @@ interface CompanyDetails {
 export default function Footer() {
 
   const [details, setDetails] = useState<CompanyDetails>({
+    
     address: "",
     email: "",
     phone: "",
     google_earth_link: "",
     map_location: "",
+    name: ""
   });
   useEffect(() => {
     // Fetch footer details from an API or database
@@ -171,7 +174,7 @@ export default function Footer() {
       </div>
 
       <div className="text-center py-4 bg-blue-950 text-sm text-white/70">
-        © {new Date().getFullYear()} Gagangauda Khanepani. All rights reserved. Developed by <Link className="text-green-600" href={'#'}>WashTech</Link>.
+        © {new Date().getFullYear()} {details.name} <Link className="text-green-600" href={'#'}>WashTech</Link>.
       </div>
     </footer>
   );
