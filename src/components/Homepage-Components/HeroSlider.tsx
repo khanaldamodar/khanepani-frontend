@@ -24,6 +24,20 @@ interface Member {
   type: string
   number: string | null
 }
+interface Member {
+  id: number
+  name: string
+  photo: string | null
+  position: string
+  type: string
+  number: string | null
+  transition_period: {
+    id: number
+    name: string
+    start_date: number
+    end_date: number
+  }
+}
 
 const GalleryWithMembers = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
@@ -47,9 +61,27 @@ const GalleryWithMembers = () => {
         const galleryData: GalleryItem[] = await galleryRes.json()
         const membersData: Member[] = await membersRes.json()
 
-        const filteredMembers = membersData.filter(
-          (m) => m.type === "board" && ["अध्यक्ष", "उपाध्याक्ष", "सचिब"].includes(m.position)
-        )
+        const currentYear = new Date().getFullYear()
+
+        const filteredMembers = membersData.filter((m) => {
+          const isBoard = m.type === "board"
+
+          const isTopPosition = [
+            "अध्यक्ष",
+            "उपाध्याक्ष",
+            "सचिब",
+            "Chairman",
+            "Vice Chairman",
+            "Secretary",
+          ].includes(m.position)
+
+          const isCurrentPeriod =
+            m.transition_period &&
+            currentYear >= m.transition_period.start_date &&
+            currentYear <= m.transition_period.end_date
+
+          return isBoard && isTopPosition && isCurrentPeriod
+        })
         console.log("Filtered Members:", filteredMembers)
 
         setGalleryItems(galleryData)
